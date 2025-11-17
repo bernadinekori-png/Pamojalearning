@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Dashboard</title>
+  <link rel="stylesheet" href="tutor.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+  <!-- Side Navigation Bar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Dashboard</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="active"><a href="#dashboard"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
+      <li><a href="files.html"><i class='bx bx-folder'></i> Files & Projects</a></li>
+      <li><a href="#analytics"><i class='bx bx-line-chart'></i> Analytics</a></li>
+      <li><a href="announcements.html"><i class='bx bx-bell'></i> Announcements</a></li>
+      <li><a href="tutorProfile.html"><i class='bx bx-user'></i> Profile</a></li>
+      <li><a href="filee.html"><i class='bx bx-log-out'></i> Logout</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <h1>Tutor Dashboard</h1>
+    </header>
+
+    <!-- Dashboard Cards -->
+    <section id="dashboard" class="dashboard-cards">
+      <a href="students.html" class="card">
+        <h3>Students Supervised</h3>
+        <p id="studentsCount">0</p>
+      </a>
+      <a href="files.html" class="card">
+        <h3>Files Pending Review</h3>
+        <p id="filesCount">0</p>
+      </a>
+      <a href="announcements.html" class="card">
+        <h3>Announcements Posted</h3>
+        <p id="announcementsCount">0</p>
+      </a>
+    </section>
+
+    <!-- Analytics Section -->
+    <section id="analytics" class="analytics-section">
+      <h2>Analytics</h2>
+      <div class="charts">
+        <div class="chart">Chart 1</div>
+        <div class="chart">Chart 2</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ✅ Dashboard JS -->
+  <script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("Please log in first.");
+      window.location.href = "login.html";
+      return;
+    }
+
+    try {
+      // ✅ Updated route to match backend
+      const res = await fetch("http://localhost:5000/api/dashboard/tutor-dashboard", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Update dashboard cards dynamically
+        document.getElementById("studentsCount").textContent = data.studentsSupervised ?? 0;
+        document.getElementById("filesCount").textContent = data.filesPendingReview ?? 0;
+        document.getElementById("announcementsCount").textContent = data.announcementsPosted ?? 0;
+      } else {
+        console.error("Error:", data.message);
+        alert("Error loading dashboard data: " + (data.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error fetching tutor dashboard data:", error);
+      alert("Network or server error while fetching dashboard data.");
+    }
+  });
+  </script>
+
+  <script src="authCheck.js"></script>
+
+</body>
+</html>

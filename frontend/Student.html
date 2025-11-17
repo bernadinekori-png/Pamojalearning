@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Dashboard</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="student.css" />
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <h2>Pamoja Learning Center</h2>
+      </div>
+
+      <ul class="menu">
+        <li><a href="#" class="active"><i class='bx bxs-dashboard'></i> Dashboard</a></li>
+        <li><a href="myprojects.html"><i class='bx bxs-book'></i> My Projects</a></li>
+        <li><a href="#"><i class='bx bxs-message-dots'></i> Feedback</a></li>
+        <li><a href="profile.html"><i class='bx bxs-user'></i> Profile</a></li>
+        <li><a href="filee.html" class="logout"><i class='bx bx-log-out'></i> Logout</a></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <header>
+        <div class="header-left">
+          <h1>Welcome back, Student!</h1>
+          <p>Track your progress and stay on top of your projects</p>
+        </div>
+
+        <!-- Notification Bell -->
+        <div class="header-right">
+          <div class="notification-bell" id="bell">
+            <i class='bx bx-bell'></i>
+            <div class="badge" id="badge">3</div>
+          </div>
+          <div class="dropdown" id="dropdown">
+            <!-- Notifications will be dynamically inserted here -->
+          </div>
+        </div>
+      </header>
+
+      <!-- Project Summary Section -->
+      <section class="profile-section">
+        <div class="profile-cards">
+          <div class="profile-card">
+            <i class='bx bxs-check-circle'></i>
+            <h3>Approved</h3>
+            <p>3 projects completed</p>
+          </div>
+
+          <div class="profile-card">
+            <i class='bx bxs-timer'></i>
+            <h3>Pending Review</h3>
+            <p>1 project awaiting feedback</p>
+          </div>
+
+          <div class="profile-card">
+            <i class='bx bxs-bar-chart-alt-2'></i>
+            <h3>Progress Summary</h3>
+            <p>View performance analytics</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Script for Logout & Notifications -->
+<!-- Script for Logout & Notifications -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const logoutLink = document.querySelector('.logout');
+  const bell = document.getElementById('bell');
+  const dropdown = document.getElementById('dropdown');
+  const badge = document.getElementById('badge');
+
+  // --- Logout ---
+  if (logoutLink) {
+    logoutLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.clear();
+        window.location.href = 'filee.html';
+      }
+    });
+  }
+
+  // --- Notifications Array ---
+  let notifications = [];
+
+  // --- Fetch notifications from backend ---
+  async function fetchNotifications() {
+    try {
+      const token = localStorage.getItem('token'); // student's JWT
+      const res = await fetch('http://localhost:5000/api/student/notifications', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch notifications');
+
+      // backend returns { notifications: [...] } or array
+      const data = await res.json();
+      notifications = Array.isArray(data.notifications) ? data.notifications : data;
+
+      renderNotifications();
+      updateBadge();
+    } catch (err) {
+      console.error('Fetch notifications error:', err);
+    }
+  }
+
+  // --- Render Notifications ---
+  function renderNotifications() {
+    dropdown.innerHTML = '';
+    notifications.forEach((note, index) => {
+      const item = document.createElement('div');
+      item.className = 'dropdown-item';
+      if (!note.read) item.style.fontWeight = 'bold';
+
+      item.innerHTML = `
+        ${note.message}
+        <div class="dropdown-time">${new Date(note.createdAt).toLocaleString()}</div>
+      `;
+
+      // Mark notification as read on click
+      item.addEventListener('click', async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const res = await fetch(`http://localhost:5000/api/student/notifications/${note._id}/read`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (!res.ok) throw new Error('Failed to mark as read');
+
+          notifications[index].read = true;
+          updateBadge();
+          renderNotifications();
+        } catch (err) {
+          console.error('Mark as read error:', err);
+        }
+      });
+
+      dropdown.appendChild(item);
+    });
+  }
+
+  // --- Update Badge Count ---
+  function updateBadge() {
+    const unreadCount = notifications.filter(n => !n.read).length;
+    if (unreadCount > 0) {
+      badge.textContent = unreadCount;
+      badge.style.display = 'block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  // --- Toggle Dropdown ---
+  bell.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('active');
+  });
+
+  // --- Close dropdown on outside click ---
+  document.addEventListener('click', (e) => {
+    if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.remove('active');
+    }
+  });
+
+  // --- Initial Fetch ---
+  fetchNotifications();
+
+  // Auto-refresh every 30 seconds (optional)
+  setInterval(fetchNotifications, 30000);
+});
+</script>
+
+<script src="authCheck.js"></script>
+</body>
+</html>
+

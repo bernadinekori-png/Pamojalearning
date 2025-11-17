@@ -1,0 +1,811 @@
+/* ====== Reset ====== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* ====== Body & Layout ====== */
+body {
+    display: flex;
+    min-height: 100vh;
+    background: #fdfdfd;
+}
+
+/* ====== Sidebar ====== */
+.sidebar {
+    width: 250px;
+    background-color: #001f3f;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    position: fixed;
+    height: 100vh;
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar-header h2 {
+    color: #4a6cf7;
+    font-size: 1.8rem;
+}
+
+.sidebar-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0 20px;
+}
+
+.sidebar-menu li a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-menu li a:hover,
+.sidebar-menu li.active a {
+    background-color: #4a6cf7;
+    color: #fff;
+}
+
+/* ====== Main Content ====== */
+.main-content {
+    margin-left: 250px;
+    padding: 30px 40px;
+    flex: 1;
+}
+
+/* Header */
+.header {
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    color: #001f3f;
+    font-size: 2rem;
+}
+
+/* ====== Dashboard Cards ====== */
+/* ====== Dashboard Cards ====== */
+.dashboard-cards {
+    display: flex;
+    gap: 30px; /* slightly larger spacing */
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1;
+    min-width: 250px; /* increase width */
+    max-width: 350px; /* optional max width for large screens */
+    height: 180px; /* taller card */
+    background-color: #fff;
+    border-radius: 20px; /* slightly rounder */
+    padding: 30px 20px; /* more padding inside */
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12); /* slightly stronger shadow */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* vertically center content */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.card h3 {
+    color: #001f3f;
+    margin-bottom: 15px; /* more spacing from number */
+    font-size: 1.6rem; /* slightly larger title */
+}
+
+.card p {
+    font-size: 2rem; /* larger number */
+    font-weight: bold;
+    color: #4a6cf7;
+}
+
+.card:hover {
+    transform: translateY(-5px); /* subtle lift on hover */
+    box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+}
+.dashboard-cards a.card {
+    text-decoration: none;
+    color: inherit;
+}
+.dashboard-cards a.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+}
+
+/* ====== Analytics ====== */
+.analytics-section .charts {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.analytics-section .chart {
+    flex: 1;
+    min-width: 250px;
+    height: 200px;
+    background-color: #fff;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #001f3f;
+    font-weight: bold;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* ====== Profile Section ====== */
+/* ====== Tutor Profile Page ====== */
+.profile-container {
+    margin-left: 50px; /* same as dashboard layout */
+    padding: 60px 80px; /* wider spacing */
+    min-height: 100vh;
+    background-color: #f9faff;
+    width: 100%;
+}
+
+.profile-container header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 50px;
+}
+
+.profile-container header h1 {
+    color: #001f3f;
+    font-size: 2.3rem;
+}
+
+.back-btn {
+    background-color: #4a6cf7;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 12px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.back-btn:hover {
+    background-color: #001f3f;
+    transform: scale(1.05);
+}
+
+/* ====== Profile Info Section ====== */
+.profile-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 70px;
+    background: #fff;
+    border-radius: 25px;
+    padding: 50px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.12);
+    margin-bottom: 60px;
+    width: 100%;
+    max-width: 1100px; /* overall card width */
+}
+
+.profile-photo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.profile-photo img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 4px solid #001f3f;
+    object-fit: cover;
+}
+
+#change-photo-btn {
+    background-color: #001f3f;
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+#change-photo-btn:hover {
+    background-color: #4a6cf7;
+    transform: scale(1.05);
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 20px;
+}
+
+.profile-details label {
+    color: #001f3f;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.profile-details input {
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.profile-details button {
+    width: fit-content;
+    padding: 12px 25px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin-top: 15px;
+    font-size: 1rem;
+}
+
+.profile-details button:hover {
+    background-color: #001f3f;
+    transform: scale(1.05);
+}
+
+/* ====== Change Password Section ====== */
+.password-section {
+    background: #fff;
+    border-radius: 40px;
+    padding: 50px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  
+}
+
+.password-section h2 {
+    color: #001f3f;
+    margin-bottom: 15px;
+    font-size: 1.6rem;
+}
+
+.password-section label {
+    color: #001f3f;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.password-section input {
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.password-section button {
+    width: fit-content;
+    padding: 12px 25px;
+    background-color: #001f3f;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+    font-size: 1rem;
+}
+
+.password-section button:hover {
+    background-color: #4a6cf7;
+    transform: scale(1.05);
+}
+
+/* ====== Tables ====== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+table thead th {
+    background-color: #001f3f;
+    color: #fff;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f5f5f5;
+}
+
+table tbody tr:hover {
+    background-color: #e6f0ff;
+}
+
+table button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #4a6cf7;
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+table button:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+/* ====== Announcements ====== */
+/* ===== Announcement Section Styles ===== */
+/* Center the whole container */
+.container {
+  max-width: 900px;       /* limits width for better layout */
+  margin: 0 auto;         /* centers horizontally */
+  padding: 20px;          /* inner spacing */
+  display: flex;          
+  flex-direction: column; /* stacks children vertically */
+  gap: 30px;              /* space between child sections */
+}
+
+/* Statistic Cards */
+.announcement-stats {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  justify-content: center;
+}
+
+.stat-card {
+  flex: 1;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #555;
+}
+
+.stat-card p {
+  font-size: 28px;
+  font-weight: bold;
+  color: #111;
+}
+
+/* Color coding for stats */
+.stat-card.today {
+  background-color: #e0f7fa; /* soft blue */
+}
+
+.stat-card.urgent {
+  background-color: #ffebee; /* light red/pink */
+}
+
+.stat-card.deadline {
+  background-color: #fff3e0; /* soft orange */
+}
+
+.stat-card.maintenance {
+  background-color: #e8f5e9; /* light green */
+}
+
+/* Create Announcement Section */
+.create-announcement {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.create-announcement input,
+.create-announcement textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.create-announcement button {
+  background-color: #2196f3;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.create-announcement button:hover {
+  background-color: #1976d2;
+}
+
+/* Announcement List & Cards */
+.announcement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.announcement-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 20px;
+  transition: transform 0.2s ease;
+}
+
+.announcement-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.card-header .icon {
+  font-size: 20px;
+}
+
+.announcement-card p {
+  margin: 0 0 15px 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-footer .date {
+  color: #999;
+  font-size: 14px;
+}
+
+.card-footer .view-btn {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.card-footer .view-btn:hover {
+  background-color: #388e3c;
+}
+
+/* Color Coding for Announcement Types */
+.announcement-card.today {
+  border-left: 6px solid #007bff;   /* blue */
+  background-color: #e7f1ff;
+}
+
+.announcement-card.urgent {
+  border-left: 6px solid #f44336;   /* red */
+  background-color: #ffe7e7;
+}
+
+.announcement-card.deadline {
+  border-left: 6px solid #fa8c16;   /* orange */
+  background-color: #fff4e6;
+}
+
+.announcement-card.maintenance {
+  border-left: 6px solid #52c41a;   /* green */
+  background-color: #f6ffed;
+}
+
+/* Style the type dropdown */
+#create-announcement select,
+#create-announcement select:focus,
+#create-announcement select:hover {
+  width: 100%;               /* full width of the container */
+  padding: 12px 15px;        /* increase clickable area */
+  font-size: 1rem;           /* bigger text */
+  border-radius: 8px;        /* rounded corners */
+  border: 1px solid #ccc;    /* subtle border */
+  outline: none;             /* remove default focus outline */
+  background-color: #f9f9f9; /* light background */
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 15px;       /* spacing from other inputs */
+}
+
+/* Focus/hover effect */
+#create-announcement select:focus,
+#create-announcement select:hover {
+  border-color: #007bff;      /* accent border color on hover/focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  background-color: #fff;      /* slightly brighter on focus */
+  cursor: pointer;
+}
+.back-dashboard {
+  margin-top: 20px;
+  text-align: left; /* aligns button to left */
+}
+
+.back-dashboard button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.back-dashboard button:hover {
+  background-color: #007bff;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .announcement-stats {
+    flex-direction: column;
+  }
+}
+/*files and uploads section*/
+/* ===== Info Cards ===== */
+.info-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.card h3 {
+  margin: 0 0 10px;
+}
+
+.card p {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+/* Specific card colors */
+.students-card {
+  background: #ffebee;
+}
+
+.projects-card {
+  background: #45a049; /* blue gradient */
+}
+
+/* ===== Students Section ===== */
+.students-section {
+  margin-bottom: 30px;
+}
+
+.students-section h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.students-list {
+  list-style: none;
+  padding: 0;
+}
+
+.students-list li {
+  background-color: #fff;
+  margin-bottom: 10px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.students-list li:hover {
+  background-color: #e9f0ff;
+  transform: translateX(2px);
+}
+
+.status.uploaded {
+  color: green;
+  font-weight: bold;
+}
+
+.status.not-uploaded {
+  color: red;
+  font-weight: bold;
+}
+
+/* ===== Projects Section ===== */
+.projects-section h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Individual Project Card */
+.project-card {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.project-card:hover {
+  background-color: #f0f8ff;
+  transform: translateY(-2px);
+}
+
+.project-info h4 {
+  margin: 0;
+  color: #007bff;
+}
+
+.project-info p {
+  margin: 5px 0 0;
+  color: #555;
+  font-size: 14px;
+}
+
+/* Project Actions */
+.project-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.project-actions button {
+  padding: 6px 12px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.project-actions button:hover {
+  background-color: #0056b3;
+}
+
+/* Checklist styling */
+.project-actions input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.project-actions label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #333;
+}
+/* ===== Student Checklist Update ===== */
+.students-list li {
+  background-color: #fff;
+  margin-bottom: 10px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.students-list li:hover {
+  background-color: #f0f8ff;
+  transform: translateX(2px);
+}
+
+/* Student checklist style */
+.student-check {
+  transform: scale(1.3);
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+.students-list label {
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+.dashboard-return {
+  margin-bottom: 20px;
+}
+
+#return-dashboard-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#return-dashboard-btn:hover {
+  background-color: #45a049;
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Profile</title>
+  <link rel="stylesheet" href="tutor.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+  <div class="profile-container">
+    <header>
+      <h1>Tutor Profile</h1>
+      <a href="Tutor.html" class="back-btn"><i class='bx bx-arrow-back'></i> Back to Dashboard</a>
+    </header>
+
+    <!-- Profile Info -->
+    <section class="profile-info">
+      <div class="profile-photo">
+        <img id="profile-img" src="default-avatar.png" alt="Profile Photo">
+        <input type="file" id="photo-input" accept="image/*" hidden>
+        <button id="change-photo-btn">Change Photo</button>
+      </div>
+
+      <div class="profile-details">
+        <label>Name:</label>
+        <input type="text" id="name" placeholder="Tutor Name">
+
+        <label>Email:</label>
+        <input type="email" id="email" placeholder="Tutor Email" readonly>
+
+        <label>Department:</label>
+        <input type="text" id="department" placeholder="Department">
+
+        <button id="save-btn">Save Changes</button>
+      </div>
+    </section>
+
+    <!-- Change Password Section -->
+    <section class="password-section">
+      <h2>Change Password</h2>
+      <label>Current Password:</label>
+      <input type="password" id="current-password" placeholder="Enter current password">
+
+      <label>New Password:</label>
+      <input type="password" id="new-password" placeholder="Enter new password">
+
+      <label>Confirm New Password:</label>
+      <input type="password" id="confirm-password" placeholder="Confirm new password">
+
+      <button id="change-password-btn">Update Password</button>
+    </section>
+  </div>
+<script src="js/tutorProfile.js"></script>
+<script src="authCheck.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+/* --- General Dashboard Layout --- */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f6fa;
+}
+
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  width: 220px;
+  background-color:#001f3f;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  text-align: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #4b4b4b;
+}
+
+.logo h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+}
+
+.menu li {
+  margin: 10px 0;
+}
+
+.menu a {
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  transition: background 0.3s;
+}
+
+.menu a i {
+  margin-right: 10px;
+}
+
+.menu a.active,
+.menu a:hover {
+  background-color:  #0056b3;
+  border-radius: 5px;
+}
+
+/* --- Main Content --- */
+.main-content {
+  flex: 1;
+  padding: 30px;
+  background-color: #f5f6fa;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #2f3640;
+}
+
+header p {
+  color: #718093;
+  margin: 5px 0 0 0;
+}
+
+/* --- Notification Bell --- */
+.header-right {
+  position: relative;
+}
+
+.notification-bell {
+  cursor: pointer;
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: #e84118;
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+.dropdown {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  width: 220px;
+  background-color: #fff;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: none;
+  z-index: 10;
+}
+
+.dropdown.active {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 12px;
+  border-bottom: 1px solid #f1f2f6;
+  font-size: 14px;
+  color: #2f3640;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-time {
+  font-size: 12px;
+  color: #718093;
+  margin-top: 4px;
+}
+
+/* --- Profile Cards Section --- */
+.profile-section {
+  margin-top: 20px;
+}
+
+.profile-cards {
+  display: flex;
+  gap: 30px; /* spacing between cards */
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.profile-card {
+  background-color: #fff;
+  flex: 1 1 calc(33.333% - 20px); /* 3 cards per row, responsive */
+  min-width: 220px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.profile-card i {
+  font-size: 36px;
+  color: #001f3f;
+  margin-bottom: 10px;
+}
+
+.profile-card h3 {
+  margin: 10px 0 5px;
+  color: #2f3640;
+}
+
+.profile-card p {
+  margin: 0;
+  color: #718093;
+  font-size: 14px;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+}

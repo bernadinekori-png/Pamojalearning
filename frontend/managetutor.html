@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Tutors</title>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="features.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Manage Tutors</h1>
+
+  <!-- Add Tutor Form -->
+  <div class="form-card">
+    <h2>Add Tutor</h2>
+    <form id="addTutorForm">
+      <input type="text" id="name" placeholder="Full Name" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="text" id="phone" placeholder="Phone Number" required>
+      <input type="text" id="subject" placeholder="Subject" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Add Tutor</button>
+    </form>
+  </div>
+
+  <!-- Tutors Table -->
+  <div class="table-card">
+    <h2>All Tutors</h2>
+    <input type="text" id="searchBar" placeholder="Search tutors...">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Subject</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tutorsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+    // ===================== Manage Tutors JS (Node.js Backend) =====================
+
+// API endpoint for tutors
+const API_URL = "http://localhost:5000/api/managet";
+
+// DOM Elements
+const tutorsTable = document.getElementById("tutorsTable");
+const searchBar = document.getElementById("searchBar");
+const addTutorForm = document.getElementById("addTutorForm");
+
+// -------- Load all tutors --------
+async function loadTutors() {
+  try {
+    const res = await fetch(API_URL);
+    const tutors = await res.json();
+    displayTutors(tutors);
+  } catch (err) {
+    console.error("Failed to load tutors:", err);
+  }
+}
+
+// -------- Display tutors in table --------
+function displayTutors(tutors) {
+  tutorsTable.innerHTML = "";
+
+  tutors.forEach(tutor => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${tutor.name}</td>
+      <td>${tutor.email}</td>
+      <td>${tutor.phone}</td>
+      <td>${tutor.subject}</td>
+      <td><span class="status ${tutor.status?.toLowerCase() || 'active'}">${tutor.status || 'Active'}</span></td>
+      <td>
+        <button class="delete-btn" onclick="deleteTutor('${tutor._id}')">Delete</button>
+      </td>
+    `;
+
+    tutorsTable.appendChild(tr);
+  });
+}
+
+// -------- Search tutors --------
+searchBar.addEventListener("input", async () => {
+  const query = searchBar.value.toLowerCase();
+  try {
+    const res = await fetch(API_URL);
+    const tutors = await res.json();
+    const filtered = tutors.filter(tutor => tutor.name.toLowerCase().includes(query));
+    displayTutors(filtered);
+  } catch (err) {
+    console.error("Search error:", err);
+  }
+});
+
+// -------- Add tutor --------
+addTutorForm.addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const newTutor = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    subject: document.getElementById("subject").value,
+    password: document.getElementById("password").value
+  };
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newTutor)
+    });
+
+    if (res.ok) {
+      alert("Tutor added successfully!");
+      addTutorForm.reset();
+      loadTutors();
+    } else {
+      const error = await res.json();
+      alert("Failed to add tutor: " + (error.message || res.statusText));
+    }
+  } catch (err) {
+    console.error("Add tutor error:", err);
+  }
+});
+
+// -------- Delete tutor --------
+async function deleteTutor(id) {
+  if (!confirm("Are you sure you want to delete this tutor?")) return;
+
+  try {
+    const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      alert("Tutor deleted successfully");
+      loadTutors();
+    } else {
+      alert("Failed to delete tutor");
+    }
+  } catch (err) {
+    console.error("Delete tutor error:", err);
+  }
+}
+
+// Load tutors on page load
+loadTutors();
+
+</script>
+</body>
+</html>

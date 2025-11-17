@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings</title>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="features.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Admin Settings</h1>
+
+  <!-- Update Admin Info -->
+  <div class="form-card">
+    <h2>Update Profile</h2>
+    <form id="updateProfileForm">
+      <input type="text" id="admin_name" placeholder="Full Name" required>
+      <input type="email" id="admin_email" placeholder="Email" required>
+      <button type="submit">Update Info</button>
+    </form>
+  </div>
+
+  <!-- Change Password -->
+  <div class="form-card">
+    <h2>Change Password</h2>
+    <form id="changePasswordForm">
+      <input type="password" id="current_password" placeholder="Current Password" required>
+      <input type="password" id="new_password" placeholder="New Password" required>
+      <input type="password" id="confirm_password" placeholder="Confirm New Password" required>
+      <button type="submit">Change Password</button>
+    </form>
+  </div>
+
+  <!-- Notifications Settings -->
+  <div class="form-card">
+    <h2>Notifications Settings</h2>
+    <div class="toggle-switch">
+      <label for="notifToggle">Enable Notifications</label>
+      <input type="checkbox" id="notifToggle" checked>
+    </div>
+  </div>
+
+  <!-- Account Deactivation -->
+  <div class="form-card">
+    <h2>Account Deactivation</h2>
+    <button id="deactivateBtn">Deactivate Account</button>
+  </div>
+
+  <!-- Logout -->
+  <div class="form-card">
+    <button id="logoutBtn" class="logout">Logout</button>
+  </div>
+</div>
+
+<!-- JS Script -->
+<script>
+// ===================== Settings JS (Real Backend) =====================
+
+const updateProfileForm = document.getElementById('updateProfileForm');
+const changePasswordForm = document.getElementById('changePasswordForm');
+const logoutBtn = document.getElementById('logoutBtn');
+const deactivateBtn = document.getElementById('deactivateBtn');
+const notifToggle = document.getElementById('notifToggle');
+
+const API_BASE = "http://localhost:5000/api/admin";
+const getToken = () => localStorage.getItem('token');
+
+// -------- Update Profile --------
+updateProfileForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const data = {
+    name: document.getElementById('admin_name').value,
+    email: document.getElementById('admin_email').value
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/profile`, {
+      method: 'PATCH',
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getToken()}`
+      },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    alert(result.message || (res.ok ? "Profile updated successfully!" : "Failed to update profile"));
+    if(res.ok) {
+      document.getElementById('admin_name').value = result.admin.name;
+      document.getElementById('admin_email').value = result.admin.email;
+    }
+  } catch(err){
+    console.error("Update profile error:", err);
+    alert("Server error");
+  }
+});
+
+// -------- Change Password --------
+changePasswordForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const currentPassword = document.getElementById('current_password').value;
+  const newPassword = document.getElementById('new_password').value;
+  const confirmPassword = document.getElementById('confirm_password').value;
+
+  if(newPassword !== confirmPassword){ 
+    alert("New passwords do not match!");
+    return; 
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/change-password`, {
+      method: 'PATCH',
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+    const result = await res.json();
+    alert(result.message || (res.ok ? "Password changed successfully!" : "Failed to change password"));
+    if(res.ok) changePasswordForm.reset();
+  } catch(err){
+    console.error("Change password error:", err);
+    alert("Server error");
+  }
+});
+
+// -------- Notifications Toggle --------
+notifToggle.addEventListener('change', async () => {
+  const enabled = notifToggle.checked;
+  try {
+    const res = await fetch(`${API_BASE}/notifications`, {
+      method: 'PATCH',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ enabled })
+    });
+    const result = await res.json();
+    if(!res.ok) alert(result.message || "Failed to update notifications");
+  } catch(err){
+    console.error("Notifications toggle error:", err);
+    alert("Server error");
+  }
+});
+
+// -------- Account Deactivation --------
+deactivateBtn.addEventListener('click', async () => {
+  if(!confirm("Are you sure you want to deactivate your account? This cannot be undone.")) return;
+  try {
+    const res = await fetch(`${API_BASE}/deactivate`, {
+      method: 'PATCH',
+      headers: { "Authorization": `Bearer ${getToken()}` }
+    });
+    const result = await res.json();
+    if(res.ok){
+      alert(result.message || "Account deactivated successfully.");
+      localStorage.clear();
+      window.location.href = 'login.html';
+    } else alert(result.message || "Failed to deactivate account");
+  } catch(err){
+    console.error("Account deactivation error:", err);
+    alert("Server error");
+  }
+});
+
+// -------- Logout --------
+logoutBtn.addEventListener('click', () => {
+  if(confirm("Are you sure you want to logout?")){
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
+});
+</script>
+
+</body>
+</html>
+

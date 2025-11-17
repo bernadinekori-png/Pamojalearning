@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login - Pamoja Learning Center</title>
+<link rel="stylesheet" href="login.css">
+</head>
+<body>
+  <div class="login-container">
+    <form id="adminLoginForm" class="login-form" action="/admin/login" method="POST">
+      <h2>PAMOJA LEARNING CENTER</h2>
+      <p>Login</p>
+      
+      <div class="input-group">
+        <input type="email" id="email" name="email" placeholder="Email" required>
+      </div>
+      
+      <div class="input-group">
+        <input type="password" id="password" name="password" placeholder="Password" required>
+      </div>
+
+      <button type="submit">Login</button>
+    </form>
+  </div>
+</body>
+</html>

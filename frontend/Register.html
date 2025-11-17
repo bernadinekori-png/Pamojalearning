@@ -1,0 +1,75 @@
+<html>
+    <head>
+    <title>Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="together">
+        <h1>Create an Account</h1>
+        <form id="registerForm">
+  <div class="input-box">
+    <input type="text" id="username" placeholder="Full Name" required>
+  </div>
+  <div class="input-box">
+    <input type="email" id="email" placeholder="Email" required>
+  </div>
+  <div class="input-box">
+    <input type="password" id="password" placeholder="Password" required>
+  </div>
+  <div class="input-box">
+    <input type="password" id="confirmPassword" placeholder="Confirm password" required>
+  </div>
+  <div class="input-box">
+    <select id="role" required>
+      <option value="" disabled selected>Select Role</option>
+      <option value="tutor">Tutor</option>
+      <option value="student">Student</option>
+    </select>
+  </div>
+  <button type="submit" class="btn">Register</button>
+  <div class="register-link">
+    <p>Already have an account?
+      <a href="filee.html">Login here</a>
+    </p>
+  </div>
+</form>
+
+    </div>
+   <script>
+document.getElementById("registerForm").addEventListener("submit", async function(event) {
+  event.preventDefault(); // prevent reload
+
+  const username = document.getElementById("username").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+  const role = document.getElementById("role").value;
+
+  if (password !== confirmPassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password, role })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Registration successful!");
+      window.location.href = "filee.html"; // Go to login page
+    } else {
+      alert("Error: " + data.message);
+    }
+  } catch (error) {
+    alert("Network error: " + error.message);
+  }
+});
+</script>
+
+</body>
+</html>

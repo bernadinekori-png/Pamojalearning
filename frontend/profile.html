@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Page</title>
+  <link rel="stylesheet" href="profile.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+  <div class="profile-section">
+
+    <!-- Top Part: Picture + Name + Info -->
+    <div class="profile-top">
+      <div class="profile-picture">
+         <img id="profileImage" alt="Profile Picture" />
+  <div id="profileInitial" class="profile-initial"></div>
+      </div>
+      <button type="button" id="uploadBtn">Change Photo</button>
+  <input type="file" id="uploadInput" name="profileImage" style="display: none;" accept="image/*">
+      <div class="profile-info">
+        <h2 class="profile-name">Jimmy Plog</h2>
+        <p class="profile-username">@jimmyplog</p>
+        <p class="profile-email">jimmy@example.com</p>
+      </div>
+    </div>
+
+    <!-- Account Stats -->
+    <div class="profile-stats">
+      <div class="stat">
+        <span class="stat-number" id="projects-count">12</span>
+        <span class="stat-label">Projects</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number" id="uploads-count">5</span>
+        <span class="stat-label">Uploads</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number" id="achievements-count">3</span>
+        <span class="stat-label">Achievements</span>
+      </div>
+    </div>
+
+    <!-- Personal Details Form -->
+    <div class="profile-details">
+      <h3>Personal Details</h3>
+      <form id="details-form">
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" value="Jimmy Plog">
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" value="@jimmyplog">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" value="jimmy@example.com">
+        </div>
+      </form>
+    </div>
+
+    <!-- Change Password Form -->
+    <div class="profile-password">
+      <h3>Change Password</h3>
+      <form id="password-form">
+        <div class="form-group">
+          <label for="currentPass">Current Password</label>
+          <input type="password" id="currentPass" placeholder="Enter current password">
+        </div>
+        <div class="form-group">
+          <label for="newPass">New Password</label>
+          <input type="password" id="newPass" placeholder="Enter new password">
+        </div>
+        <div class="form-group">
+          <label for="confirmPass">Confirm New Password</label>
+          <input type="password" id="confirmPass" placeholder="Confirm new password">
+        </div>
+      </form>
+    </div>
+
+    <!-- Save Changes Button (Bottom of Profile) -->
+    <div class="profile-actions">
+      <button type="button" class="btn edit-profile" id="save-changes">
+        <i class='bx bx-edit-alt'></i> Save Changes
+      </button>
+    </div>
+
+  </div>
+
+  <!-- JavaScript to handle functionality -->
+ <script>
+const API_BASE = "http://localhost:5000"; // backend URL
+const token = localStorage.getItem("token"); // JWT from login
+
+// Redirect if not logged in
+if (!token) {
+    alert("You are not logged in!");
+    window.location.href = "filee.html";
+}
+
+// Elements
+const profileImage = document.getElementById('profileImage');
+const uploadBtn = document.getElementById('uploadBtn');
+const uploadInput = document.getElementById('uploadInput');
+const profileInitial = document.getElementById('profileInitial');
+
+// ===== Fetch and display user info on page load =====
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const res = await fetch(`${API_BASE}/api/profile`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const user = await res.json();
+
+        if (!res.ok) {
+            throw new Error(user.message || "Failed to fetch profile");
+        }
+
+        // Populate inputs
+        document.getElementById('fullName').value = user.fullName || '';
+        document.getElementById('username').value = user.username || '';
+        document.getElementById('email').value = user.email || '';
+
+        // Display user info
+        document.querySelector('.profile-name').innerText = user.fullName || 'No name';
+        document.querySelector('.profile-username').innerText = user.username || '@username';
+        document.querySelector('.profile-email').innerText = user.email || 'example@email.com';
+
+        // Display stats
+        document.getElementById('projects-count').innerText = user.projects || 0;
+        document.getElementById('uploads-count').innerText = user.uploads || 0;
+        document.getElementById('achievements-count').innerText = user.achievements || 0;
+
+        // Display profile image or initial
+        if (user.profileImage) {
+            profileImage.src = `${API_BASE}${user.profileImage}?t=${Date.now()}`;
+            profileImage.style.display = 'block';
+            profileInitial.style.display = 'none';
+        } else {
+            profileImage.style.display = 'none';
+            profileInitial.innerText = user.fullName ? user.fullName[0].toUpperCase() : '?';
+            profileInitial.style.display = 'flex';
+        }
+
+    } catch (err) {
+        console.error("Error fetching profile:", err);
+        alert(err.message);
+    }
+});
+
+// ===== Save profile changes =====
+document.getElementById('save-changes').addEventListener('click', async () => {
+    const fullName = document.getElementById('fullName').value;
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/profile/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ fullName, username, email })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to update profile");
+
+        alert(data.message);
+
+    } catch (err) {
+        console.error("Error updating profile:", err);
+        alert(err.message);
+    }
+});
+
+// ===== Change password =====
+document.getElementById('change-password')?.addEventListener('click', async () => {
+    const currentPass = document.getElementById('currentPass').value;
+    const newPass = document.getElementById('newPass').value;
+    const confirmPass = document.getElementById('confirmPass').value;
+
+    if (newPass !== confirmPass) {
+        alert('New passwords do not match!');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/profile/password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ currentPass, newPass })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to change password");
+
+        alert(data.message);
+
+    } catch (err) {
+        console.error("Error changing password:", err);
+        alert(err.message);
+    }
+});
+
+// ===== Profile image upload =====
+uploadBtn.addEventListener("click", () => uploadInput.click());
+
+uploadInput.addEventListener("change", async () => {
+    const file = uploadInput.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("profileImage", file);
+
+    try {
+        const res = await fetch(`${API_BASE}/api/profile/upload-image`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to upload image");
+
+        // Update profile image with cache-busting
+        profileImage.src = `${API_BASE}${data.imageUrl}?t=${Date.now()}`;
+        profileImage.style.display = 'block';
+        profileInitial.style.display = 'none';
+        alert("Profile image updated successfully!");
+
+    } catch (err) {
+        console.error("Upload error:", err);
+        alert(err.message);
+    }
+});
+</script>
+
+
+<script src="authCheck.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Files</title>
+  <link rel="stylesheet" href="tutor.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header Cards -->
+    <section class="info-cards">
+      <div class="card students-card">
+        <h3>Total Students</h3>
+        <p id="total-students">0</p>
+      </div>
+      <div class="card projects-card">
+        <h3>Total Projects</h3>
+        <p id="total-projects">0</p>
+      </div>
+    </section>
+
+    <!-- Students Section -->
+    <section class="students-section">
+      <h2>Students You Supervise</h2>
+      <input type="text" id="search-bar" placeholder="Search student..." />
+      <ul class="students-list"></ul>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="projects-section">
+      <h2 id="projects-title">Projects</h2>
+      <div class="projects-list"></div>
+    </section>
+
+    <div class="dashboard-return">
+      <button id="return-dashboard-btn">← Return to Dashboard</button>
+    </div>
+
+  </div>
+
+  <script src="files.js"></script>
+</body>
+</html>

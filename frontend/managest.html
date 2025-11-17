@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Students</title>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="features.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Manage Students</h1>
+
+  <!-- Add Student Form -->
+  <div class="form-card">
+    <h2>Add Student</h2>
+    <form id="addStudentForm">
+      <input type="text" id="s_name" placeholder="Full Name" required>
+      <input type="email" id="s_email" placeholder="Email" required>
+      <input type="text" id="s_phone" placeholder="Phone Number" required>
+      <input type="text" id="s_course" placeholder="Course" required>
+      <input type="password" id="s_password" placeholder="Password" required>
+      <button type="submit">Add Student</button>
+    </form>
+  </div>
+
+  <!-- Students Table -->
+  <div class="table-card">
+    <h2>All Students</h2>
+    <input type="text" id="s_searchBar" placeholder="Search students...">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Course</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="studentsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- JS Script -->
+<script>
+  // ===================== Manage Students JS (Live Updates) =====================
+
+  const API_URL = "http://localhost:5000/api/managest";
+
+  // DOM Elements
+  const studentsTable = document.getElementById("studentsTable");
+  const s_searchBar = document.getElementById("s_searchBar");
+  const addStudentForm = document.getElementById("addStudentForm");
+
+  let allStudents = []; // store all students in memory for live search
+
+  // -------- Load all students --------
+  async function loadStudents() {
+    try {
+      const res = await fetch(API_URL);
+      allStudents = await res.json();
+      displayStudents(allStudents);
+    } catch (err) {
+      console.error("Failed to load students:", err);
+    }
+  }
+
+  // -------- Display students in table --------
+  function displayStudents(students) {
+    studentsTable.innerHTML = "";
+
+    if (students.length === 0) {
+      studentsTable.innerHTML = `<tr><td colspan="6" style="text-align:center;">No students found</td></tr>`;
+      return;
+    }
+
+    students.forEach(student => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${student.name}</td>
+        <td>${student.email}</td>
+        <td>${student.phone}</td>
+        <td>${student.course}</td>
+        <td><span class="status ${student.status?.toLowerCase() || 'active'}">${student.status || 'Active'}</span></td>
+        <td>
+          <button class="delete-btn" onclick="deleteStudent('${student._id}')">Delete</button>
+        </td>
+      `;
+
+      studentsTable.appendChild(tr);
+    });
+  }
+
+  // -------- Search students live --------
+  s_searchBar.addEventListener("input", () => {
+    const query = s_searchBar.value.toLowerCase();
+    const filtered = allStudents.filter(student => student.name.toLowerCase().includes(query));
+    displayStudents(filtered);
+  });
+
+  // -------- Add student --------
+  addStudentForm.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const newStudent = {
+      name: document.getElementById("s_name").value,
+      email: document.getElementById("s_email").value,
+      phone: document.getElementById("s_phone").value,
+      course: document.getElementById("s_course").value,
+      password: document.getElementById("s_password").value
+    };
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newStudent)
+      });
+
+      if (res.ok) {
+        const createdStudent = await res.json();
+        allStudents.unshift(createdStudent); // add to the top of the in-memory array
+        displayStudents(allStudents);
+        addStudentForm.reset();
+        alert("Student added successfully!");
+      } else {
+        const error = await res.json();
+        alert("Failed to add student: " + (error.message || res.statusText));
+      }
+    } catch (err) {
+      console.error("Add student error:", err);
+    }
+  });
+
+  // -------- Delete student --------
+  async function deleteStudent(id) {
+    if (!confirm("Are you sure you want to delete this student?")) return;
+
+    try {
+      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        // remove from in-memory array and update table
+        allStudents = allStudents.filter(s => s._id !== id);
+        displayStudents(allStudents);
+        alert("Student deleted successfully");
+      } else {
+        alert("Failed to delete student");
+      }
+    } catch (err) {
+      console.error("Delete student error:", err);
+    }
+  }
+
+  // Load students on page load
+  loadStudents();
+</script>
+
+
+</body>
+</html>

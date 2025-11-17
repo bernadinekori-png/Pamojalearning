@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Announcements</title>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="features.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Manage Announcements</h1>
+
+  <!-- Add Announcement Form -->
+  <div class="form-card">
+    <h2>Add Announcement</h2>
+    <form id="addAnnouncementForm">
+      <input type="text" id="title" placeholder="Title" required>
+      <textarea id="message" placeholder="Message" rows="4" required></textarea>
+      <select id="audience">
+        <option value="All">All</option>
+        <option value="Tutors">Tutors</option>
+        <option value="Students">Students</option>
+      </select>
+      <button type="submit">Post Announcement</button>
+    </form>
+  </div>
+
+  <!-- Announcements Table -->
+  <div class="table-card">
+    <h2>All Announcements</h2>
+    <input type="text" id="searchAnnouncement" placeholder="Search announcements...">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Message</th>
+          <th>Audience</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="announcementsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- JS Script -->
+<script>
+const API_URL = "http://localhost:5000/api/announcements";
+
+const announcementsTable = document.getElementById("announcementsTable");
+const searchAnnouncement = document.getElementById("searchAnnouncement");
+const addAnnouncementForm = document.getElementById("addAnnouncementForm");
+
+let allAnnouncements = [];
+
+// -------- Load announcements --------
+async function loadAnnouncements() {
+  try {
+    const res = await fetch(API_URL);
+    allAnnouncements = await res.json();
+    displayAnnouncements(allAnnouncements);
+  } catch (err) {
+    console.error("Failed to load announcements:", err);
+  }
+}
+
+// -------- Display announcements in table --------
+function displayAnnouncements(list) {
+  announcementsTable.innerHTML = "";
+  if(list.length === 0) {
+    announcementsTable.innerHTML = `<tr><td colspan="5" style="text-align:center;">No announcements found</td></tr>`;
+    return;
+  }
+
+  list.forEach(a => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${a.title}</td>
+      <td>${a.message}</td>
+      <td>${a.audience}</td>
+      <td>${new Date(a.createdAt).toLocaleString()}</td>
+      <td>
+        <button class="delete-btn" onclick="deleteAnnouncement('${a._id}')">Delete</button>
+      </td>
+    `;
+    announcementsTable.appendChild(tr);
+  });
+}
+
+// -------- Search announcements --------
+searchAnnouncement.addEventListener("input", () => {
+  const query = searchAnnouncement.value.toLowerCase();
+  const filtered = allAnnouncements.filter(a => a.title.toLowerCase().includes(query) || a.message.toLowerCase().includes(query));
+  displayAnnouncements(filtered);
+});
+
+// -------- Add announcement --------
+addAnnouncementForm.addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const newAnnouncement = {
+    title: document.getElementById("title").value,
+    message: document.getElementById("message").value,
+    audience: document.getElementById("audience").value
+  };
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newAnnouncement)
+    });
+
+    if(res.ok) {
+      const created = await res.json();
+      allAnnouncements.unshift(created);
+      displayAnnouncements(allAnnouncements);
+      addAnnouncementForm.reset();
+      alert("Announcement posted successfully!");
+    } else {
+      const error = await res.json();
+      alert("Failed to post announcement: " + (error.message || res.statusText));
+    }
+  } catch(err) {
+    console.error("Add announcement error:", err);
+  }
+});
+
+// -------- Delete announcement --------
+async function deleteAnnouncement(id) {
+  if(!confirm("Are you sure you want to delete this announcement?")) return;
+
+  try {
+    const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+    if(res.ok) {
+      allAnnouncements = allAnnouncements.filter(a => a._id !== id);
+      displayAnnouncements(allAnnouncements);
+      alert("Announcement deleted successfully");
+    } else {
+      alert("Failed to delete announcement");
+    }
+  } catch(err) {
+    console.error("Delete announcement error:", err);
+  }
+}
+
+// Load on page load
+loadAnnouncements();
+</script>
+
+</body>
+</html>
+

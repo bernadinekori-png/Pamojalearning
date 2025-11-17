@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Announcements</title>
+  <link rel="stylesheet" href="tutor.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Announcements</h1>
+
+    <!-- Statistic Cards -->
+    <section class="announcement-stats">
+      <div class="stat-card today">
+        <h3>Announcements Today</h3>
+        <p id="count-today">0</p>
+      </div>
+      <div class="stat-card urgent">
+        <h3>Urgent Notices</h3>
+        <p id="count-urgent">0</p>
+      </div>
+      <div class="stat-card deadline">
+        <h3>Submission Deadlines</h3>
+        <p id="count-deadline">0</p>
+      </div>
+      <div class="stat-card maintenance">
+        <h3>Service Maintenance</h3>
+        <p id="count-maintenance">0</p>
+      </div>
+    </section>
+
+    <!-- Create Announcement Section -->
+    <section class="create-announcement" id="create-announcement">
+      <input type="text" id="title" placeholder="Title">
+      <textarea id="message" placeholder="Message"></textarea>
+      <select id="type">
+        <option value="today">Today</option>
+        <option value="urgent">Urgent</option>
+        <option value="deadline">Submission Deadline</option>
+        <option value="maintenance">Service Maintenance</option>
+      </select>
+      <button id="createBtn">Create Announcement</button>
+    </section>
+
+    <!-- Announcement List -->
+    <section class="announcement-list" id="announcementList">
+      <!-- Predefined Example Cards -->
+      <div class="announcement-card urgent">
+        <div class="card-header">
+          <span class="icon">📌</span>
+          <h4>Server Maintenance Tonight</h4>
+        </div>
+        <p>The system will be down from 10 PM to 12 AM. Please save your work.</p>
+        <div class="card-footer">
+          <span class="date">Nov 9, 2025</span>
+          <button class="view-btn">View Details</button>
+        </div>
+      </div>
+
+      <div class="announcement-card deadline">
+        <div class="card-header">
+          <span class="icon">📅</span>
+          <h4>Project Submission Deadline</h4>
+        </div>
+        <p>All final projects must be submitted by Nov 15, 2025.</p>
+        <div class="card-footer">
+          <span class="date">Nov 9, 2025</span>
+          <button class="view-btn">View Details</button>
+        </div>
+      </div>
+    </section>
+    <!-- Back to Dashboard Button -->
+<div class="back-dashboard">
+  <button id="backBtn">← Back to Dashboard</button>
+</div>
+
+  </div>
+
+  <!-- JS Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem("token");
+      const createBtn = document.getElementById("createBtn");
+      const announcementList = document.getElementById("announcementList");
+
+      const countToday = document.getElementById("count-today");
+      const countUrgent = document.getElementById("count-urgent");
+      const countDeadline = document.getElementById("count-deadline");
+      const countMaintenance = document.getElementById("count-maintenance");
+
+      if (!token) return alert("You must be logged in!");
+
+      // Fetch and display dynamic announcements
+      async function loadAnnouncements() {
+        try {
+          const res = await fetch("http://localhost:5000/api/announcements", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+
+          if (res.ok) {
+            // Remove only dynamic announcements (keep predefined cards)
+            document.querySelectorAll("#announcementList .announcement-card.dynamic").forEach(el => el.remove());
+
+            // Reset stats counts
+            let stats = { today: 0, urgent: 0, deadline: 0, maintenance: 0 };
+
+            data.announcements.forEach(announcement => {
+              // Count stats
+              if (announcement.type in stats) stats[announcement.type]++;
+
+              // Append dynamic announcement
+              const div = document.createElement("div");
+              div.classList.add("announcement-card", "dynamic", announcement.type);
+              div.innerHTML = `
+                <div class="card-header">
+                  <span class="icon">📌</span>
+                  <h4>${announcement.title}</h4>
+                </div>
+                <p>${announcement.message}</p>
+                <div class="card-footer">
+                  <span class="date">${new Date(announcement.createdAt).toLocaleDateString()}</span>
+                  <button class="view-btn">View Details</button>
+                </div>
+              `;
+              announcementList.appendChild(div);
+            });
+
+            // Update stats cards
+            countToday.textContent = stats.today;
+            countUrgent.textContent = stats.urgent;
+            countDeadline.textContent = stats.deadline;
+            countMaintenance.textContent = stats.maintenance;
+
+          } else {
+            console.error("Failed to load announcements:", data.message);
+          }
+        } catch (err) {
+          console.error("Error loading announcements:", err);
+        }
+      }
+
+      // Create new announcement
+      createBtn.addEventListener("click", async () => {
+        const title = document.getElementById("title").value.trim();
+        const message = document.getElementById("message").value.trim();
+        const type = document.getElementById("type").value;
+
+        if (!title || !message) return alert("Title and message are required!");
+
+        try {
+          const res = await fetch("http://localhost:5000/api/announcements", {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ title, message, type }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            document.getElementById("title").value = "";
+            document.getElementById("message").value = "";
+            document.getElementById("type").value = "today";
+            loadAnnouncements(); // refresh dynamic announcements
+          } else {
+            alert(data.message || "Error creating announcement");
+          }
+        } catch (err) {
+          console.error("Error creating announcement:", err);
+        }
+      });
+      const backBtn = document.getElementById("backBtn");
+backBtn.addEventListener("click", () => {
+  // Redirect to tutor dashboard page
+  window.location.href = "tutor.html"; // adjust path as needed
+});
+
+
+      loadAnnouncements(); // Initial load
+    });
+  </script>
+
+  <script src="authCheck.js"></script>
+</body>
+</html>
