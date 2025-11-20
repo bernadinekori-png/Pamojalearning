@@ -1,43 +1,49 @@
 const Admin = require('../models/admin');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const path = require('path');
+
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"; // use same secret as middleware
 
 // Show login page
 exports.showLoginPage = (req, res) => {
-  // Serve login page from frontend folder
-  res.sendFile('login.html', { root: path.join(__dirname, '../frontend') });
+  res.sendFile('filee.html', { root: path.join(__dirname, '../frontend') });
 };
 
-// Handle login form submission
+// Handle unified login (admin part)
 exports.loginAdmin = async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   try {
-    const admin = await Admin.findOne({ email });
-    if (!admin) return res.status(400).send('Invalid email or password');
+    // Find admin by username
+    const admin = await Admin.findOne({ name: username }); // assuming admin model has 'name' field
+    if (!admin) return res.status(400).json({ message: 'Invalid username or password' });
 
-    if (!admin.active) return res.status(403).send('Account inactive. Contact support.');
+    if (!admin.active) return res.status(403).json({ message: 'Account inactive. Contact support.' });
 
     // Compare password
     const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) return res.status(400).send('Invalid email or password');
+    if (!isMatch) return res.status(400).json({ message: 'Invalid username or password' });
 
-    // Set session
-    req.session.adminId = admin._id;
-    req.session.adminName = admin.name;
+    // Generate JWT token
+    const token = jwt.sign({ id: admin._id, role: 'admin', name: admin.name }, JWT_SECRET, { expiresIn: '1h' });
 
-    // Redirect to admin dashboard
-    res.redirect('/admin/dashboard');
+    // Send JSON response
+    res.json({
+      message: 'Login successful',
+      token,
+      role: 'admin',
+      username: admin.name
+    });
+
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server error');
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Show dashboard
+// Show admin dashboard
 exports.showDashboard = (req, res) => {
-  if (!req.session.adminId) return res.redirect('/admin/login');
-  // Serve admin dashboard page from frontend folder
   res.sendFile('admin.html', { root: path.join(__dirname, '../frontend') });
 };
 
@@ -48,6 +54,6 @@ exports.logoutAdmin = (req, res) => {
       console.error(err);
       return res.status(500).send('Error logging out');
     }
-    res.redirect('/admin/login');
+    res.redirect('/login');
   });
 };

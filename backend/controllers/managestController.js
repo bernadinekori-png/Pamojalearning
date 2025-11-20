@@ -1,4 +1,6 @@
 const ManageStudent = require('../models/managest');
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 
 // ---------------- GET ALL STUDENTS ----------------
 const getStudents = async (req, res) => {
@@ -13,27 +15,45 @@ const getStudents = async (req, res) => {
 
 // ---------------- ADD NEW STUDENT ----------------
 const addStudent = async (req, res) => {
-    const { name, email, phone, course, password } = req.body;
+  const { name, email, phone, course, password } = req.body;
 
-    if (!name || !email || !phone || !course || !password) {
-        return res.status(400).json({ message: "All fields are required" });
+  if (!name || !email || !phone || !course || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    // 1) Check ManageStudent email uniqueness (your existing check)
+    const existing = await ManageStudent.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: "Email already exists" });
     }
 
-    try {
-        // Check if email already exists
-        const existing = await ManageStudent.findOne({ email });
-        if (existing) {
-            return res.status(400).json({ message: "Email already exists" });
-        }
-
-        const student = new ManageStudent({ name, email, phone, course, password });
-        await student.save();
-
-        res.status(201).json(student);
-    } catch (err) {
-        console.error("Error adding student:", err);
-        res.status(500).json({ message: "Server error" });
+    // 2) Also ensure username is unique in User collection.
+    // We'll use 'name' as the username that the student will log in with.
+    const existingUser = await User.findOne({ username: name });
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
     }
+
+    // 3) Create the ManageStudent record (for admin management)
+    const student = new ManageStudent({ name, email, phone, course, password });
+    await student.save();
+
+    // 4) Hash password and create User record (for login/auth)
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({
+      username: name,         // students log in with this username
+      email,
+      password: hashedPassword,
+      role: "student",
+      department: course || "",
+    });
+
+    res.status(201).json(student);
+  } catch (err) {
+    console.error("Error adding student:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 // ---------------- DELETE STUDENT ----------------

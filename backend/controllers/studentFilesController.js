@@ -7,13 +7,19 @@ exports.uploadFiles = async (req, res) => {
   try {
     const folderName = req.body.folderName || null;
 
+    // Common way to resolve student name
+    const resolvedStudentName =
+      (req.user && req.user.name) ||
+      req.body.studentName ||
+      "Unknown Student";
+
     if (folderName) {
       const folder = new ProjectFile({
         fileName: folderName,
         fileType: "folder",
         filePath: `uploads/${folderName}`,
         isFolder: true,
-        studentName: req.body.studentName || "Unknown Student", // save student name
+        studentName: resolvedStudentName,
       });
       await folder.save();
       return res.json({ message: "Folder uploaded successfully", file: folder });
@@ -30,7 +36,7 @@ exports.uploadFiles = async (req, res) => {
         fileType: file.mimetype,
         filePath,
         isFolder: false,
-        studentName: req.body.studentName || "Unknown Student", // save student name
+        studentName: resolvedStudentName,
       });
 
       await newFile.save();
@@ -81,13 +87,12 @@ exports.deleteFile = async (req, res) => {
 exports.searchFiles = async (req, res) => {
   try {
     const { q } = req.query;
-    const files = await ProjectFile.find({ fileName: { $regex: q, $options: "i" } });
+    const files = await ProjectFile.find({
+      fileName: { $regex: q, $options: "i" },
+    });
     res.json(files);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Search failed" });
   }
 };
-
-
-

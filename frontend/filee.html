@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>login form</title>
+    <title>Login Form</title>
     <link rel="stylesheet" href="style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   </head>
@@ -9,86 +9,110 @@
       <form id="loginForm">
         <h1>PAMOJA LEARNING CENTER</h1>
         <h2>Login</h2>
+
         <div class="input-box">
           <input type="text" id="username" placeholder="Username" required>
           <i class='bx bxs-user'></i>
         </div>
+
         <div class="input-box">
           <input type="password" id="password" placeholder="Password" required>
           <i class='bx bxs-lock-alt'></i>
         </div>
-        <div class="input-box">
-          <select id="role" class="role-select" required>
+
+        <div class="input-box" id="roleDiv">
+          <select id="role" class="role-select">
             <option value="">--Select Role--</option>
             <option value="Student">Student</option>
             <option value="Tutor">Tutor</option>
           </select>
           <i class='bx bxs-chevron-down select-arrow'></i>
         </div>
+
         <div class="remember-forgot">
           <label><input type="checkbox"> Remember me</label>
           <a href="Forgot.html">Forgot Password?</a>
         </div>
+
         <button type="submit" class="btn">Login</button>
+
         <div class="register-link">
-          <p>Dont have an account?<a href="Register.html">Register</a></p>
+          <p>Don't have an account? <a href="Register.html">Register</a></p>
         </div>
       </form>
     </div>
 
     <script>
-document.querySelector("form").addEventListener("submit", async function(e) {
-  e.preventDefault();
+      document.getElementById("loginForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
 
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  const role = document.getElementById("role").value;
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const roleDropdown = document.getElementById("role");
+        let role = roleDropdown ? roleDropdown.value : null;
 
-  if (!role) {
-    alert("Please select a role before logging in.");
-    return;
-  }
+        // List of admin usernames
+        const adminUsernames = ["superadmin", "newadmin", "cyyynthia"];
+        const isAdmin = adminUsernames.includes(username.toLowerCase());
 
-  try {
-    const response = await fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+        // Only require role selection if not admin
+        if (!isAdmin && (!role || role === "")) {
+          alert("Please select a role before logging in.");
+          return;
+        }
 
-    const data = await response.json();
+        // If admin, override role to "admin"
+        if (isAdmin) role = "admin";
 
-    if (response.ok) {
-      if (!data.token) {
-        alert("Login failed: no token received.");
-        return;
-      }
+        try {
+          const loginUrl = isAdmin
+            ? "http://localhost:5000/admin/login"   // Admins use admin login route
+            : "http://localhost:5000/api/auth/login"; // Students/Tutors use user auth route
 
-      // ✅ Store the JWT token for future authenticated requests
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("userRole", data.role);
-      localStorage.setItem("username", username);
+          const response = await fetch(loginUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password, role }),
+          });
 
-      alert(data.message);
+          const data = await response.json();
 
-      // Redirect based on role
-      if (data.role.toLowerCase() === "student") {
-        window.location.href = "Student.html";
-      } else if (data.role.toLowerCase() === "tutor") {
-        window.location.href = "Tutor.html";
-      } else {
-        alert("Unknown role: " + data.role);
-      }
-    } else {
-      alert(data.message || "Login failed!");
-    }
-  } catch (error) {
-    console.error("Login error:", error);
-    alert("Server not responding. Please try again later.");
-  }
-});
-</script>
+          if (response.ok) {
+            if (!data.token) {
+              alert("Login failed: no token received.");
+              return;
+            }
 
+            // Store token, role, and username
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("userRole", role); // use the JS-set role
+            localStorage.setItem("username", username);
 
+            alert(data.message);
+
+            // Redirect based on role
+            switch (role.toLowerCase()) {
+              case "student":
+                window.location.href = "Student.html";
+                break;
+              case "tutor":
+                window.location.href = "Tutor.html";
+                break;
+              case "admin":
+                window.location.href = "admin.html";
+                break;
+              default:
+                alert("Unknown role: " + role);
+            }
+
+          } else {
+            alert(data.message || "Login failed!");
+          }
+        } catch (error) {
+          console.error("Login error:", error);
+          alert("Server not responding. Please try again later.");
+        }
+      });
+    </script>
   </body>
 </html>

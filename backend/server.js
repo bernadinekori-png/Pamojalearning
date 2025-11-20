@@ -19,6 +19,7 @@ const tutorRoutes = require("./routes/tutorRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
 const tutorFilesRoutes = require("./routes/tutorFilesRoutes");
 const notificationRoutes = require('./routes/notificationRoutes');
+const adminDashboardRoutes = require("./routes/adminDashboardRoutes");
 const manageRoutes = require('./routes/managetRoutes');
 const manageStudentRoutes = require('./routes/managestRoutes'); // Students routes
 const announceRoutes = require('./routes/announceRoutes');
@@ -69,6 +70,7 @@ app.use("/api/tutor", tutorRoutes); // ✅ Tutor profile/update routes
 app.use("/api/announcements", announcementRoutes);
 app.use("/api/tutor/files", tutorFilesRoutes);
 app.use('/api/student/notifications', notificationRoutes);
+app.use("/api/admin", adminDashboardRoutes);
 app.use('/api/managet', manageRoutes);  // Manage Tutors endpoints
 app.use('/api/managest', manageStudentRoutes);  // Students endpoints
 app.use('/api/announcements', announceRoutes); // <- Announcement routes
