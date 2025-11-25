@@ -7,6 +7,143 @@ body {
   padding: 0;
 }
 
+/* Admin sidebar layout shared across admin feature pages */
+.sidebar {
+  width: 220px;
+  background: #1f2937;
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar a {
+  color: #fff;
+  text-decoration: none;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.sidebar a i {
+  margin-right: 10px;
+}
+
+.sidebar a:hover {
+  background: #374151;
+}
+
+body {
+  display: flex;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+/* Hamburger button for admin feature pages */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 300;
+  background: #1f2937;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 22px;
+}
+
+/* Responsive layout for admin feature pages (off-canvas sidebar) */
+@media (max-width: 1024px) {
+  .hamburger {
+    display: block;
+  }
+
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -240px;
+    width: 220px;
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 250;
+    transition: left 0.3s ease;
+  }
+
+  body.sidebar-open .sidebar {
+    left: 0;
+  }
+
+  .main-content {
+    padding: 70px 20px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Shared top navigation for admin feature pages */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #1f2937;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+.top-nav .nav-logo {
+  font-weight: 600;
+}
+
+.top-nav .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+
+.top-nav .nav-links a {
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.top-nav .nav-links a.active,
+.top-nav .nav-links a:hover {
+  color: #fff;
+}
+
 .container {
   width: 90%;
   margin: 30px auto;
@@ -539,6 +676,29 @@ button.logout {
   .form-card button {
     font-size: 0.95rem;
     padding: 8px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+    margin: 20px auto;
+    padding: 0 10px;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-card {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
   }
 }
 

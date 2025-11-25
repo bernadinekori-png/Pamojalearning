@@ -3,7 +3,8 @@ const ProjectFile = require("../models/myproject");
 // Get all student files (for tutor dashboard)
 exports.getTutorProjects = async (req, res) => {
   try {
-    const files = await ProjectFile.find().sort({ uploadedAt: -1 });
+    const tutorId = req.user && req.user.id;
+    const files = await ProjectFile.find({ tutorId }).sort({ uploadedAt: -1 });
 
     res.status(200).json(files);
   } catch (error) {

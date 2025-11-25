@@ -8,6 +8,24 @@
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
+  <button id="tutorSidebarToggle" class="hamburger" aria-label="Toggle navigation">
+    <i class='bx bx-menu'></i>
+  </button>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Dashboard</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="Tutor.html"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
+      <li class="active"><a href="files.html"><i class='bx bx-folder'></i> Files & Projects</a></li>
+      <li><a href="announcements.html"><i class='bx bx-bell'></i> Announcements</a></li>
+      <li><a href="tutorProfile.html"><i class='bx bx-user'></i> Profile</a></li>
+      <li><a href="filee.html"><i class='bx bx-log-out'></i> Logout</a></li>
+    </ul>
+  </aside>
+
+  <div class="main-content">
   <div class="container">
 
     <!-- Header Cards -->
@@ -35,12 +53,23 @@
       <div class="projects-list"></div>
     </section>
 
+    <!-- Return to Dashboard Button (used by files.js) -->
     <div class="dashboard-return">
       <button id="return-dashboard-btn">← Return to Dashboard</button>
     </div>
 
   </div>
 
+  </div>
+
+  <script>
+  const tutorSidebarToggle = document.getElementById('tutorSidebarToggle');
+  if (tutorSidebarToggle) {
+    tutorSidebarToggle.addEventListener('click', function () {
+      document.body.classList.toggle('sidebar-open');
+    });
+  }
+  </script>
   <script src="files.js"></script>
 </body>
 </html>

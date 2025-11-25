@@ -2,10 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Announcements</title>
   <link rel="stylesheet" href="tutor.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
+  <button id="tutorSidebarToggle" class="hamburger" aria-label="Toggle navigation">
+    <i class='bx bx-menu'></i>
+  </button>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Dashboard</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="Tutor.html"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
+      <li><a href="files.html"><i class='bx bx-folder'></i> Files & Projects</a></li>
+      <li class="active"><a href="announcements.html"><i class='bx bx-bell'></i> Announcements</a></li>
+      <li><a href="tutorProfile.html"><i class='bx bx-user'></i> Profile</a></li>
+      <li><a href="filee.html"><i class='bx bx-log-out'></i> Logout</a></li>
+    </ul>
+  </aside>
+
+  <div class="main-content">
   <div class="container">
     <h1>Announcements</h1>
 
@@ -28,6 +48,16 @@
         <p id="count-maintenance">0</p>
       </div>
     </section>
+
+    <!-- View Details Modal -->
+    <div id="detailsModal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); align-items:center; justify-content:center;">
+      <div class="modal-content" style="background:#fff; padding:20px 24px; border-radius:10px; max-width:480px; width:90%; box-shadow:0 10px 30px rgba(0,0,0,0.2); position:relative;">
+        <span id="detailsClose" style="position:absolute; right:12px; top:8px; cursor:pointer; font-size:20px;">&times;</span>
+        <h2 id="detailsTitle" style="margin-bottom:10px;"></h2>
+        <p id="detailsMessage" style="margin-bottom:12px; line-height:1.4;"></p>
+        <small id="detailsDate" style="color:#6b7280;"></small>
+      </div>
+    </div>
 
     <!-- Create Announcement Section -->
     <section class="create-announcement" id="create-announcement">
@@ -69,15 +99,18 @@
         </div>
       </div>
     </section>
-    <!-- Back to Dashboard Button -->
-<div class="back-dashboard">
-  <button id="backBtn">← Back to Dashboard</button>
-</div>
+  </div>
 
   </div>
 
   <!-- JS Script -->
   <script>
+    const tutorSidebarToggle = document.getElementById('tutorSidebarToggle');
+    if (tutorSidebarToggle) {
+      tutorSidebarToggle.addEventListener('click', function () {
+        document.body.classList.toggle('sidebar-open');
+      });
+    }
     document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem("token");
       const createBtn = document.getElementById("createBtn");
@@ -88,6 +121,12 @@
       const countDeadline = document.getElementById("count-deadline");
       const countMaintenance = document.getElementById("count-maintenance");
 
+      const detailsModal = document.getElementById("detailsModal");
+      const detailsTitle = document.getElementById("detailsTitle");
+      const detailsMessage = document.getElementById("detailsMessage");
+      const detailsDate = document.getElementById("detailsDate");
+      const detailsClose = document.getElementById("detailsClose");
+
       if (!token) return alert("You must be logged in!");
 
       // Fetch and display dynamic announcements
@@ -96,6 +135,14 @@
           const res = await fetch("http://localhost:5000/api/announcements", {
             headers: { Authorization: `Bearer ${token}` },
           });
+
+      // View details modal close handlers
+      detailsClose.addEventListener('click', () => {
+        detailsModal.style.display = 'none';
+      });
+      detailsModal.addEventListener('click', (e) => {
+        if (e.target === detailsModal) detailsModal.style.display = 'none';
+      });
           const data = await res.json();
 
           if (res.ok) {
@@ -112,6 +159,7 @@
               // Append dynamic announcement
               const div = document.createElement("div");
               div.classList.add("announcement-card", "dynamic", announcement.type);
+              div.dataset.id = announcement._id;
               div.innerHTML = `
                 <div class="card-header">
                   <span class="icon">📌</span>
@@ -120,9 +168,42 @@
                 <p>${announcement.message}</p>
                 <div class="card-footer">
                   <span class="date">${new Date(announcement.createdAt).toLocaleDateString()}</span>
-                  <button class="view-btn">View Details</button>
+                  <div class="actions">
+                    <button class="view-btn">View Details</button>
+                    <button class="delete-btn" style="margin-left:8px; background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Delete</button>
+                  </div>
                 </div>
               `;
+
+              const viewBtn = div.querySelector('.view-btn');
+              const deleteBtn = div.querySelector('.delete-btn');
+
+              viewBtn.addEventListener('click', () => {
+                detailsTitle.textContent = announcement.title;
+                detailsMessage.textContent = announcement.message;
+                detailsDate.textContent = new Date(announcement.createdAt).toLocaleString();
+                detailsModal.style.display = 'flex';
+              });
+
+              deleteBtn.addEventListener('click', async () => {
+                if (!confirm('Delete this announcement?')) return;
+                try {
+                  const delRes = await fetch(`http://localhost:5000/api/announcements/${announcement._id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  const delData = await delRes.json().catch(() => ({}));
+                  if (!delRes.ok) {
+                    console.error('Failed to delete', delData);
+                    return alert(delData.message || 'Failed to delete announcement');
+                  }
+                  loadAnnouncements();
+                } catch (e) {
+                  console.error('Error deleting announcement', e);
+                  alert('Error deleting announcement');
+                }
+              });
+
               announcementList.appendChild(div);
             });
 
@@ -171,13 +252,6 @@
           console.error("Error creating announcement:", err);
         }
       });
-      const backBtn = document.getElementById("backBtn");
-backBtn.addEventListener("click", () => {
-  // Redirect to tutor dashboard page
-  window.location.href = "tutor.html"; // adjust path as needed
-});
-
-
       loadAnnouncements(); // Initial load
     });
   </script>

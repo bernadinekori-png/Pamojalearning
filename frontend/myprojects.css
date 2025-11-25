@@ -16,6 +16,43 @@ body {
   min-height: 100vh;
 }
 
+/* Top navigation for student pages */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #001f3f;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+.top-nav .nav-logo {
+  font-weight: 600;
+}
+
+.top-nav .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+
+.top-nav .nav-links a {
+  color: #ddd;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.top-nav .nav-links a.active,
+.top-nav .nav-links a:hover {
+  color: #fff;
+}
+
 /* ===== Top Bar ===== */
 .topbar {
   width: 100%;
@@ -24,7 +61,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 40px;
+  padding: 75px 40px 15px;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -258,7 +295,7 @@ body {
   display: block;
 }
 
-/* ===== Modal Styling ===== */
+/* ===== Modal Base Styling ===== */
 .modal {
   display: none;
   position: fixed;
@@ -267,24 +304,27 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(11, 15, 25, 0.55);
   justify-content: center;
   align-items: center;
+  backdrop-filter: blur(4px);
 }
 
 .modal-content {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 22px 24px;
+  width: 420px;
+  max-width: 92%;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
   position: relative;
 }
 
 .modal-content h2 {
-  margin-bottom: 15px;
-  color: #333;
+  margin-bottom: 14px;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .modal-content input[type="file"] {
@@ -293,18 +333,27 @@ body {
 }
 
 .modal-content button {
-  background: #4a6cf7;
+  background: linear-gradient(135deg, #4a6cf7, #7c5cff);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
+  border-radius: 10px;
+  padding: 9px 18px;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.3s ease;
+  font-weight: 500;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+  box-shadow: 0 8px 18px rgba(88, 80, 236, 0.35);
 }
 
 .modal-content button:hover {
-  background: #3959d4;
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(88, 80, 236, 0.4);
+}
+
+.modal-content button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(88, 80, 236, 0.3);
 }
 
 .close {
@@ -320,6 +369,50 @@ body {
   color: #000;
 }
 
+/* ===== Premium styling for Share-to-Tutor modal ===== */
+#shareModal .modal-content {
+  background: linear-gradient(145deg, #ffffff, #eef1ff);
+  border-radius: 18px;
+  padding: 24px 26px 20px;
+}
+
+#shareModal h2 {
+  font-size: 19px;
+  margin-bottom: 18px;
+}
+
+#shareModal label {
+  display: block;
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+#shareModal select {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+  margin-bottom: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+#shareModal select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
+  background: #ffffff;
+}
+
+#shareModal #shareConfirmBtn {
+  width: 100%;
+  justify-content: center;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 700px) {
   .top-boxes {
@@ -333,5 +426,15 @@ body {
 
   .modal-content {
     width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 10px 16px;
+  }
+
+  .project-area {
+    width: 95%;
   }
 }

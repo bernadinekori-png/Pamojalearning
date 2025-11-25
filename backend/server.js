@@ -6,6 +6,9 @@ const session = require("express-session"); // ✅ Added for admin login session
 require("dotenv").config();
 const path = require("path");
 
+// Load backup scheduler (runs cron jobs for file backups)
+require("./backup");
+
 // Database connection
 const connectDB = require("./config/db");
 

@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 exports.updateProfile = async (req, res) => {
   try {
     const { name, email } = req.body;
-    const adminId = req.admin.id; // from auth middleware
+    const adminId = req.user._id; // from auth middleware
 
     if (!name || !email) {
       return res.status(400).json({ message: 'Name and email are required' });
@@ -31,7 +31,7 @@ exports.updateProfile = async (req, res) => {
 exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    const adminId = req.admin.id;
+    const adminId = req.user._id;
 
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ message: 'Both passwords are required' });
@@ -55,7 +55,7 @@ exports.changePassword = async (req, res) => {
 // -------- Toggle Notifications --------
 exports.toggleNotifications = async (req, res) => {
   try {
-    const adminId = req.admin.id;
+    const adminId = req.user._id;
     const { enabled } = req.body;
 
     let settings = await Settings.findOne({ admin: adminId });
@@ -76,7 +76,7 @@ exports.toggleNotifications = async (req, res) => {
 // -------- Deactivate Account --------
 exports.deactivateAccount = async (req, res) => {
   try {
-    const adminId = req.admin.id;
+    const adminId = req.user._id;
 
     const admin = await Admin.findById(adminId);
     if (!admin) return res.status(404).json({ message: 'Admin not found' });

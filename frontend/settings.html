@@ -8,6 +8,21 @@
 <link rel="stylesheet" href="features.css">
 </head>
 <body>
+  <button id="adminSidebarToggle" class="hamburger" aria-label="Toggle navigation">
+    <i class='bx bx-menu'></i>
+  </button>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>Admin Panel</h2>
+  <a href="admin.html"><i class='bx bxs-dashboard'></i> Dashboard</a>
+  <a href="managetutor.html"><i class='bx bx-user'></i> Manage Tutors</a>
+  <a href="managest.html"><i class='bx bx-group'></i> Manage Students</a>
+  <a href="announce.html"><i class='bx bx-bell'></i> Announcements</a>
+  <a href="settings.html"><i class='bx bx-cog'></i> Settings</a>
+</div>
+
+<div class="main-content">
 
 <div class="container">
   <h1>Admin Settings</h1>
@@ -42,21 +57,27 @@
     </div>
   </div>
 
-  <!-- Account Deactivation -->
-  <div class="form-card">
-    <h2>Account Deactivation</h2>
-    <button id="deactivateBtn">Deactivate Account</button>
-  </div>
+  
 
   <!-- Logout -->
   <div class="form-card">
     <button id="logoutBtn" class="logout">Logout</button>
   </div>
+
+  <button id="adminSidebarToggle" class="hamburger" aria-label="Toggle navigation">
+    <i class='bx bx-menu'></i>
+  </button>
+
 </div>
 
 <!-- JS Script -->
 <script>
-// ===================== Settings JS (Real Backend) =====================
+const sidebarToggle = document.getElementById('adminSidebarToggle');
+if (sidebarToggle) {
+  sidebarToggle.addEventListener('click', function () {
+    document.body.classList.toggle('sidebar-open');
+  });
+}
 
 const updateProfileForm = document.getElementById('updateProfileForm');
 const changePasswordForm = document.getElementById('changePasswordForm');

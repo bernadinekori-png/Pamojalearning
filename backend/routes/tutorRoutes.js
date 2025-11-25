@@ -3,6 +3,18 @@ const router = express.Router();
 const { verifyToken, authorizeRole } = require("../middleware/auth");
 const { updatePhoto, updateProfile, changePassword } = require("../controllers/tutorController");
 const upload = require("../middleware/upload");
+const User = require("../models/User");
+
+// List tutors (for students to choose when sharing projects)
+router.get("/list", verifyToken, async (req, res) => {
+  try {
+    const tutors = await User.find({ role: "tutor" }).select("_id username email department");
+    res.json(tutors);
+  } catch (err) {
+    console.error("/api/tutor/list error", err);
+    res.status(500).json({ message: "Failed to load tutors" });
+  }
+});
 
 // GET tutor dashboard
 router.get("/", verifyToken, authorizeRole(["tutor"]), async (req, res) => {

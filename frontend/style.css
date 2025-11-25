@@ -256,6 +256,66 @@ body{
     overflow-y: auto;
 }
 
+/* Responsive layout for dashboard and sidebar */
+@media (max-width: 1024px) {
+    .dashboard-container {
+        position: static;
+        height: auto;
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        overflow-y: visible;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .main-content header {
+        padding: 20px;
+    }
+
+    .profile-cards {
+        flex-direction: column;
+    }
+
+    .profile-card {
+        max-width: 100%;
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 16px;
+    }
+
+    header h1 {
+        font-size: 22px;
+    }
+
+    .profile-card {
+        padding: 20px 16px;
+        height: auto;
+    }
+}
+
 /* ==== Header ==== */
 .main-content header {
     width: 100%;

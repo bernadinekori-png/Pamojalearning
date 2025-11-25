@@ -24,6 +24,12 @@ exports.verifyToken = async (req, res, next) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Ensure role is available for authorization checks
+    if (!user.role && decoded.role) {
+      // Admin model doesn't have 'role' field by default, but routes expect req.user.role
+      user.role = decoded.role;
+    }
+
     req.user = user; // attach user document
     next();
   } catch (err) {

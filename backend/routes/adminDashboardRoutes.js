@@ -4,10 +4,13 @@ const router = express.Router();
 
 // Import models
 const Tutor = require("../models/Tutor");
-//const Student = require("../models/Student");
+const Student = require("../models/Student");
+const ManageStudent = require("../models/managest");
+const ManageTutor = require("../models/managet");
 const Announcement = require("../models/Announcement");
 const ProjectFile = require("../models/myproject");
 const Notification = require("../models/notification");
+const Activity = require("../models/Activity");
 
 // ----------------------------
 // GET /api/admin/kpis
@@ -15,13 +18,16 @@ const Notification = require("../models/notification");
 // ----------------------------
 router.get("/kpis", async (req, res) => {
   try {
-    const [totalTutors, totalStudents, totalAnnouncements, pendingRequests] =
+    const [mainTutorCount, managedTutorCount, totalStudents, totalAnnouncements, pendingRequests] =
       await Promise.all([
         Tutor.countDocuments(),
+        ManageTutor.countDocuments(),
         ManageStudent.countDocuments(),
         Announcement.countDocuments(),
         ProjectFile.countDocuments({ status: "pending" }),
       ]);
+
+    const totalTutors = mainTutorCount + managedTutorCount;
 
     res.json({
       totalTutors,
@@ -112,12 +118,13 @@ router.get("/charts", async (req, res) => {
 // ----------------------------
 router.get("/recent-activities", async (req, res) => {
   try {
-    const [latestAnnouncements, latestFiles] = await Promise.all([
+    const [latestAnnouncements, latestFiles, latestTutorActivities] = await Promise.all([
       Announcement.find().sort({ createdAt: -1 }).limit(5),
       ProjectFile.find().sort({ uploadedAt: -1 }).limit(5),
+      Activity.find({ role: "tutor" }).sort({ createdAt: -1 }).limit(10),
     ]);
 
-    const activities = [
+    const rawActivities = [
       ...latestAnnouncements.map((a) => ({
         activity: `Announcement: ${a.title}`,
         user: a.role === "admin" ? "Admin" : "Tutor",
@@ -128,7 +135,28 @@ router.get("/recent-activities", async (req, res) => {
         user: f.studentName,
         date: f.uploadedAt,
       })),
-    ]
+      ...latestTutorActivities.map((act) => ({
+        activity: act.activity,
+        user: act.userName,
+        date: act.createdAt,
+      })),
+    ];
+
+    // Filter to only today's activities (local date)
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const day = today.getDate();
+
+    const activities = rawActivities
+      .filter((item) => {
+        const d = new Date(item.date);
+        return (
+          d.getFullYear() === year &&
+          d.getMonth() === month &&
+          d.getDate() === day
+        );
+      })
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 10);
 

@@ -9,6 +9,10 @@
 </head>
 <body>
 
+  <button id="tutorSidebarToggle" class="hamburger" aria-label="Toggle navigation">
+    <i class='bx bx-menu'></i>
+  </button>
+
   <!-- Side Navigation Bar -->
   <aside class="sidebar">
     <div class="sidebar-header">
@@ -17,7 +21,6 @@
     <ul class="sidebar-menu">
       <li class="active"><a href="#dashboard"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
       <li><a href="files.html"><i class='bx bx-folder'></i> Files & Projects</a></li>
-      <li><a href="#analytics"><i class='bx bx-line-chart'></i> Analytics</a></li>
       <li><a href="announcements.html"><i class='bx bx-bell'></i> Announcements</a></li>
       <li><a href="tutorProfile.html"><i class='bx bx-user'></i> Profile</a></li>
       <li><a href="filee.html"><i class='bx bx-log-out'></i> Logout</a></li>
@@ -46,19 +49,23 @@
         <p id="announcementsCount">0</p>
       </a>
     </section>
-
-    <!-- Analytics Section -->
-    <section id="analytics" class="analytics-section">
-      <h2>Analytics</h2>
-      <div class="charts">
-        <div class="chart">Chart 1</div>
-        <div class="chart">Chart 2</div>
-      </div>
+    
+    <section id="recent-activities" class="recent-activities">
+      <h2>Recent Activities</h2>
+      <ul id="activitiesList"></ul>
+      <p id="noActivitiesMessage" style="display: none;">No recent activities yet.</p>
     </section>
   </main>
 
-  <!-- ✅ Dashboard JS -->
+  <!-- Dashboard JS -->
   <script>
+  const tutorSidebarToggle = document.getElementById('tutorSidebarToggle');
+  if (tutorSidebarToggle) {
+    tutorSidebarToggle.addEventListener('click', function () {
+      document.body.classList.toggle('sidebar-open');
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("token");
 
@@ -69,7 +76,7 @@
     }
 
     try {
-      // ✅ Updated route to match backend
+      // Updated route to match backend
       const res = await fetch("http://localhost:5000/api/dashboard/tutor-dashboard", {
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -84,6 +91,38 @@
         document.getElementById("studentsCount").textContent = data.studentsSupervised ?? 0;
         document.getElementById("filesCount").textContent = data.filesPendingReview ?? 0;
         document.getElementById("announcementsCount").textContent = data.announcementsPosted ?? 0;
+
+        const activitiesList = document.getElementById("activitiesList");
+        const noActivitiesMessage = document.getElementById("noActivitiesMessage");
+
+        activitiesList.innerHTML = "";
+
+        if (Array.isArray(data.recentActivities) && data.recentActivities.length > 0) {
+          noActivitiesMessage.style.display = "none";
+
+          data.recentActivities.forEach((activity) => {
+            const li = document.createElement("li");
+            const date = activity.date ? new Date(activity.date) : null;
+            const dateText = date ? date.toLocaleString() : "";
+
+            const textSpan = document.createElement("span");
+            textSpan.className = "activity-text";
+            textSpan.textContent = activity.description;
+
+            const dateSpan = document.createElement("span");
+            dateSpan.className = "activity-date";
+            dateSpan.textContent = dateText;
+
+            li.appendChild(textSpan);
+            if (dateText) {
+              li.appendChild(dateSpan);
+            }
+
+            activitiesList.appendChild(li);
+          });
+        } else {
+          noActivitiesMessage.style.display = "block";
+        }
       } else {
         console.error("Error:", data.message);
         alert("Error loading dashboard data: " + (data.message || "Unknown error"));

@@ -1,13 +1,138 @@
 // frontend/js/tutorProfile.js
 document.addEventListener("DOMContentLoaded", () => {
+  const BASE_URL = "http://localhost:5000";
   const photoInput = document.getElementById("photo-input");
   const changeBtn = document.getElementById("change-photo-btn");
   const profileImg = document.getElementById("profile-img");
+  const nameInput = document.getElementById("name");
+  const emailInput = document.getElementById("email");
+  const departmentInput = document.getElementById("department");
+  const saveBtn = document.getElementById("save-btn");
+  const currentPasswordInput = document.getElementById("current-password");
+  const newPasswordInput = document.getElementById("new-password");
+  const confirmPasswordInput = document.getElementById("confirm-password");
+  const changePasswordBtn = document.getElementById("change-password-btn");
 
   // click handler to open file dialog
   changeBtn.addEventListener("click", () => {
     photoInput.click();
   });
+
+  // Load current tutor profile (including saved photo) on page load
+  (async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/dashboard/tutor`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+      const user = data.user || data.data || {};
+
+      if (user.username && nameInput) nameInput.value = user.username;
+      if (user.email && emailInput) emailInput.value = user.email;
+      if (user.department && departmentInput) departmentInput.value = user.department;
+
+      if (user.photo && profileImg) {
+        const photoUrl = user.photo.startsWith("http")
+          ? user.photo
+          : `${BASE_URL}${user.photo}`;
+        profileImg.src = `${photoUrl}?t=${Date.now()}`;
+      }
+    } catch (err) {
+      console.error("Error loading tutor profile:", err);
+    }
+  })();
+
+  // Save basic profile info (name, email, department)
+  if (saveBtn) {
+    saveBtn.addEventListener("click", async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You must be logged in to save profile.");
+        return;
+      }
+
+      const body = {
+        name: nameInput ? nameInput.value.trim() : undefined,
+        email: emailInput ? emailInput.value.trim() : undefined,
+        department: departmentInput ? departmentInput.value.trim() : undefined,
+      };
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/tutor/profile`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          console.error("Profile update failed", data);
+          return alert(data.message || "Failed to update profile");
+        }
+
+        showToast("Profile updated successfully");
+      } catch (err) {
+        console.error("Error updating profile", err);
+        alert("Error updating profile");
+      }
+    });
+  }
+
+  // Change password
+  if (changePasswordBtn) {
+    changePasswordBtn.addEventListener("click", async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You must be logged in to change password.");
+        return;
+      }
+
+      const currentPassword = currentPasswordInput ? currentPasswordInput.value : "";
+      const newPassword = newPasswordInput ? newPasswordInput.value : "";
+      const confirmNewPassword = confirmPasswordInput ? confirmPasswordInput.value : "";
+
+      if (!currentPassword || !newPassword || !confirmNewPassword) {
+        alert("Please fill in all password fields.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/tutor/profile/password`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ currentPassword, newPassword, confirmNewPassword }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          console.error("Password change failed", data);
+          return alert(data.message || "Failed to change password");
+        }
+
+        showToast("Password updated successfully");
+        if (currentPasswordInput) currentPasswordInput.value = "";
+        if (newPasswordInput) newPasswordInput.value = "";
+        if (confirmPasswordInput) confirmPasswordInput.value = "";
+      } catch (err) {
+        console.error("Error changing password", err);
+        alert("Error changing password");
+      }
+    });
+  }
 
   photoInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
@@ -42,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/tutor-dashboard/profile/photo", {
+      const res = await fetch(`${BASE_URL}/api/tutor/profile/photo`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
@@ -53,7 +178,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (res.ok) {
         // update image src to server-hosted URL (prevent caching by appending timestamp)
-        profileImg.src = `${data.photoUrl}?t=${Date.now()}`;
+        const serverUrl = data.photoUrl.startsWith("http")
+          ? data.photoUrl
+          : `${BASE_URL}${data.photoUrl}`;
+        profileImg.src = `${serverUrl}?t=${Date.now()}`;
         showToast("Photo updated successfully");
       } else {
         alert(data.message || "Upload failed");

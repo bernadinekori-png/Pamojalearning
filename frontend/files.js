@@ -67,7 +67,8 @@ function renderProjects(studentName, files) {
       <div class="project-info">
         <h4>Project: ${file.fileName}</h4>
         <p>Uploaded: ${new Date(file.uploadedAt).toLocaleDateString()}</p>
-        <p>Status: ${file.status ? capitalize(file.status) : "Pending"}</p>
+        <p class="project-status">Status: ${file.status ? capitalize(file.status) : "Pending"}</p>
+        ${file.feedback ? `<p class="project-feedback"><strong>Feedback:</strong> ${file.feedback}</p>` : ""}
       </div>
       <div class="project-actions">
         <a href="http://localhost:5000/${file.filePath}" target="_blank">
@@ -77,8 +78,50 @@ function renderProjects(studentName, files) {
           <input type="checkbox" class="project-check" ${file.status === "reviewed" ? "checked" : ""} disabled>
           Reviewed
         </label>
+        <textarea class="feedback-input" placeholder="Write feedback...">${file.feedback || ""}</textarea>
+        <button class="feedback-btn">Send feedback</button>
       </div>
     `;
+
+    const feedbackInput = card.querySelector(".feedback-input");
+    const feedbackBtn = card.querySelector(".feedback-btn");
+    const statusEl = card.querySelector(".project-status");
+    const reviewedCheckbox = card.querySelector(".project-check");
+
+    feedbackBtn.addEventListener("click", async () => {
+      const feedback = feedbackInput.value.trim();
+      try {
+        const res = await fetch(`http://localhost:5000/api/tutor/files/${file._id}/review`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ feedback }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          console.error("Feedback update failed", data);
+          return alert(data.message || "Failed to update feedback");
+        }
+
+        // Update UI to reflect reviewed status
+        if (statusEl) {
+          statusEl.textContent = "Status: Reviewed";
+        }
+        if (reviewedCheckbox) {
+          reviewedCheckbox.checked = true;
+        }
+
+        alert("Feedback saved and file marked as reviewed");
+        // Optionally refresh full list in background for consistency
+        getTutorFiles();
+      } catch (err) {
+        console.error("Error sending feedback", err);
+        alert("Error sending feedback");
+      }
+    });
 
     projectsList.appendChild(card);
   });

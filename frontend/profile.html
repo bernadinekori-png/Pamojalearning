@@ -9,6 +9,16 @@
 </head>
 <body>
 
+  <nav class="top-nav student-nav">
+    <div class="nav-logo">Pamoja Learning Center</div>
+    <ul class="nav-links">
+      <li><a href="Student.html">Dashboard</a></li>
+      <li><a href="myprojects.html">My Projects</a></li>
+      <li><a href="profile.html" class="active">Profile</a></li>
+      <li><a href="filee.html">Logout</a></li>
+    </ul>
+  </nav>
+
   <div class="profile-section">
 
     <!-- Top Part: Picture + Name + Info -->
@@ -128,11 +138,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector('.profile-username').innerText = user.username || '@username';
         document.querySelector('.profile-email').innerText = user.email || 'example@email.com';
 
-        // Display stats
-        document.getElementById('projects-count').innerText = user.projects || 0;
-        document.getElementById('uploads-count').innerText = user.uploads || 0;
-        document.getElementById('achievements-count').innerText = user.achievements || 0;
-
         // Display profile image or initial
         if (user.profileImage) {
             profileImage.src = `${API_BASE}${user.profileImage}?t=${Date.now()}`;
@@ -144,19 +149,77 @@ document.addEventListener('DOMContentLoaded', async () => {
             profileInitial.style.display = 'flex';
         }
 
+        // After loading user, load stats based on their files
+        await loadAccountStats();
+
     } catch (err) {
         console.error("Error fetching profile:", err);
         alert(err.message);
     }
 });
 
-// ===== Save profile changes =====
+// ===== Load account stats (projects, uploads, achievements) from student files =====
+async function loadAccountStats() {
+    try {
+        const res = await fetch(`${API_BASE}/api/files`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const files = Array.isArray(data) ? data : (data.files || []);
+
+        const totalProjects = files.length;
+        const totalUploads = files.filter(f => !f.isFolder).length;
+        const achievements = files.filter(f => f.status === "reviewed").length;
+
+        document.getElementById('projects-count').innerText = totalProjects;
+        document.getElementById('uploads-count').innerText = totalUploads;
+        document.getElementById('achievements-count').innerText = achievements;
+    } catch (err) {
+        console.error("Error loading account stats:", err);
+    }
+}
+
+// ===== Save profile changes (and password if filled) =====
 document.getElementById('save-changes').addEventListener('click', async () => {
     const fullName = document.getElementById('fullName').value;
     const username = document.getElementById('username').value;
     const email = document.getElementById('email').value;
 
+    const currentPass = document.getElementById('currentPass').value;
+    const newPass = document.getElementById('newPass').value;
+    const confirmPass = document.getElementById('confirmPass').value;
+
     try {
+        // 1) If password fields are filled, handle password change first
+        const wantsPasswordChange = currentPass || newPass || confirmPass;
+        if (wantsPasswordChange) {
+            if (!currentPass || !newPass || !confirmPass) {
+                alert('Please fill in current, new, and confirm password.');
+                return;
+            }
+            if (newPass !== confirmPass) {
+                alert('New passwords do not match!');
+                return;
+            }
+
+            const passRes = await fetch(`${API_BASE}/api/profile/password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ currentPass, newPass })
+            });
+
+            const passData = await passRes.json();
+            if (!passRes.ok) throw new Error(passData.message || 'Failed to change password');
+
+            alert(passData.message || 'Password updated successfully');
+        }
+
+        // 2) Update basic profile fields
         const res = await fetch(`${API_BASE}/api/profile/update`, {
             method: 'POST',
             headers: {
@@ -167,44 +230,12 @@ document.getElementById('save-changes').addEventListener('click', async () => {
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Failed to update profile");
+        if (!res.ok) throw new Error(data.message || 'Failed to update profile');
 
-        alert(data.message);
-
-    } catch (err) {
-        console.error("Error updating profile:", err);
-        alert(err.message);
-    }
-});
-
-// ===== Change password =====
-document.getElementById('change-password')?.addEventListener('click', async () => {
-    const currentPass = document.getElementById('currentPass').value;
-    const newPass = document.getElementById('newPass').value;
-    const confirmPass = document.getElementById('confirmPass').value;
-
-    if (newPass !== confirmPass) {
-        alert('New passwords do not match!');
-        return;
-    }
-
-    try {
-        const res = await fetch(`${API_BASE}/api/profile/password`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ currentPass, newPass })
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Failed to change password");
-
-        alert(data.message);
+        alert(data.message || 'Profile updated successfully');
 
     } catch (err) {
-        console.error("Error changing password:", err);
+        console.error('Error updating profile/password:', err);
         alert(err.message);
     }
 });

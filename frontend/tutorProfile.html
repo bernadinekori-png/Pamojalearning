@@ -9,6 +9,25 @@
 </head>
 <body>
 
+  <button id="tutorSidebarToggle" class="hamburger" aria-label="Toggle navigation">
+    <i class='bx bx-menu'></i>
+  </button>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Dashboard</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="Tutor.html"><i class='bx bx-grid-alt'></i> Dashboard</a></li>
+      <li><a href="files.html"><i class='bx bx-folder'></i> Files & Projects</a></li>
+      <li><a href="announcements.html"><i class='bx bx-bell'></i> Announcements</a></li>
+      <li class="active"><a href="tutorProfile.html"><i class='bx bx-user'></i> Profile</a></li>
+      <li><a href="filee.html"><i class='bx bx-log-out'></i> Logout</a></li>
+    </ul>
+  </aside>
+
+  <div class="main-content">
+
   <div class="profile-container">
     <header>
       <h1>Tutor Profile</h1>
@@ -18,7 +37,10 @@
     <!-- Profile Info -->
     <section class="profile-info">
       <div class="profile-photo">
-        <img id="profile-img" src="default-avatar.png" alt="Profile Photo">
+        <img
+          id="profile-img"
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><rect width='100%' height='100%' rx='90' ry='90' fill='%23001f3f'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='56' fill='%23ffffff' font-family='Arial, sans-serif'>T</text></svg>"
+          alt="Profile Photo">
         <input type="file" id="photo-input" accept="image/*" hidden>
         <button id="change-photo-btn">Change Photo</button>
       </div>
@@ -52,8 +74,18 @@
       <button id="change-password-btn">Update Password</button>
     </section>
   </div>
-<script src="js/tutorProfile.js"></script>
-<script src="authCheck.js"></script>
+
+  </div>
+  <script>
+  const tutorSidebarToggle = document.getElementById('tutorSidebarToggle');
+  if (tutorSidebarToggle) {
+    tutorSidebarToggle.addEventListener('click', function () {
+      document.body.classList.toggle('sidebar-open');
+    });
+  }
+  </script>
+  <script src="scripts/tutorProfile.js"></script>
+  <script src="authCheck.js"></script>
 
 </body>
 </html>

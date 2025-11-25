@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const Activity = require("../models/Activity");
 
 // ------------------------
 // Update profile photo
@@ -19,6 +20,14 @@ const updatePhoto = async (req, res) => {
     );
 
     if (!updated) return res.status(404).json({ message: "User not found" });
+
+    // Log activity for admin
+    await Activity.create({
+      userId: updated._id,
+      userName: updated.username || updated.name || "Tutor",
+      role: "tutor",
+      activity: "Updated profile photo",
+    });
 
     res.json({
       message: "Photo updated",
@@ -50,6 +59,16 @@ const updateProfile = async (req, res) => {
     );
 
     if (!updated) return res.status(404).json({ message: "User not found" });
+
+    // Build a simple description of what changed
+    const changedFields = Object.keys(updateFields).join(", ") || "profile";
+
+    await Activity.create({
+      userId: updated._id,
+      userName: updated.username || updated.name || "Tutor",
+      role: "tutor",
+      activity: `Updated ${changedFields}`,
+    });
 
     res.json({
       message: "Profile updated successfully",
@@ -84,6 +103,13 @@ const changePassword = async (req, res) => {
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
+
+    await Activity.create({
+      userId: user._id,
+      userName: user.username || user.name || "Tutor",
+      role: "tutor",
+      activity: "Changed account password",
+    });
 
     res.json({ message: "Password updated successfully" });
   } catch (err) {

@@ -1,4 +1,6 @@
 const ManageTutor = require('../models/managet');
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 
 // ---------------- GET ALL TUTORS ----------------
 const getTutors = async (req, res) => {
@@ -20,14 +22,31 @@ const addTutor = async (req, res) => {
     }
 
     try {
-        // Check if email already exists
+        // Check if email already exists in ManageTutor
         const existing = await ManageTutor.findOne({ email });
         if (existing) {
             return res.status(400).json({ message: "Email already exists" });
         }
 
+        // Also ensure username is unique in User collection (use name as username)
+        const existingUser = await User.findOne({ username: name });
+        if (existingUser) {
+            return res.status(400).json({ message: "Username already exists" });
+        }
+
+        // Create ManageTutor record
         const tutor = new ManageTutor({ name, email, phone, subject, password });
         await tutor.save();
+
+        // Hash password and create User record for login/auth
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await User.create({
+            username: name,
+            email,
+            password: hashedPassword,
+            role: "tutor",
+            department: subject || "",
+        });
 
         res.status(201).json(tutor);
     } catch (err) {

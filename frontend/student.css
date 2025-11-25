@@ -63,7 +63,7 @@ body {
 /* --- Main Content --- */
 .main-content {
   flex: 1;
-  padding: 30px;
+  padding: 40px 40px 30px;
   background-color: #f5f6fa;
 }
 
@@ -143,12 +143,13 @@ header p {
 
 /* --- Profile Cards Section --- */
 .profile-section {
-  margin-top: 20px;
+  margin-top: 30px;
+  margin-bottom: 30px; /* extra space between sections */
 }
 
 .profile-cards {
   display: flex;
-  gap: 30px; /* spacing between cards */
+  gap: 32px; /* spacing between cards */
   flex-wrap: wrap;
   justify-content: space-between;
 }
@@ -186,4 +187,69 @@ header p {
 
 .profile-card:hover {
   transform: translateY(-5px);
+}
+
+/* --- Recent Activity List --- */
+.recent-activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recent-activity-item {
+  background-color: #ffffff;
+  border: 1px solid #e1e4ea;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #2f3640;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.recent-activity-item:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Responsive Layout (Student) --- */
+@media (max-width: 1024px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .profile-cards {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .profile-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 16px;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
 }

@@ -9,14 +9,17 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <button id="adminSidebarToggle" class="hamburger" aria-label="Toggle navigation">
+    <i class='bx bx-menu'></i>
+  </button>
 
 <!-- Sidebar -->
 <div class="sidebar">
   <h2>Admin Panel</h2>
+  <a href="admin.html"><i class='bx bxs-dashboard'></i> Dashboard</a>
   <a href="managetutor.html"><i class='bx bx-user'></i> Manage Tutors</a>
   <a href="managest.html"><i class='bx bx-group'></i> Manage Students</a>
   <a href="announce.html"><i class='bx bx-bell'></i> Announcements</a>
-  <a href="#"><i class='bx bx-bar-chart'></i> Analytics</a>
   <a href="settings.html"><i class='bx bx-cog'></i> Settings</a>
 </div>
 
@@ -26,11 +29,6 @@
   <div class="header">
     <h1>Welcome, Admin</h1>
     <div class="header-right">
-      <div class="notifications">
-        <i class='bx bx-bell' id="bell"></i>
-        <span id="badge">0</span>
-        <div id="dropdown" class="dropdown"></div>
-      </div>
       <button class="logout">Logout</button>
     </div>
   </div>
@@ -48,22 +46,6 @@
     <div class="card card-announcements">
       <h3>Total Announcements</h3>
       <p id="totalAnnouncements">0</p>
-    </div>
-    <div class="card card-requests">
-      <h3>Pending Requests</h3>
-      <p id="pendingRequests">0</p>
-    </div>
-  </div>
-
-  <!-- Charts Section -->
-  <div class="charts">
-    <div class="chart">
-      <h3>Students per Tutor</h3>
-      <canvas id="studentsPerTutor"></canvas>
-    </div>
-    <div class="chart">
-      <h3>Announcements Over Time</h3>
-      <canvas id="announcementsOverTime"></canvas>
     </div>
   </div>
 
@@ -87,68 +69,22 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const logoutLink = document.querySelector('.logout');
-  const bell = document.getElementById('bell');
-  const dropdown = document.getElementById('dropdown');
-  const badge = document.getElementById('badge');
+  const sidebarToggle = document.getElementById('adminSidebarToggle');
+
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function () {
+      document.body.classList.toggle('sidebar-open');
+    });
+  }
 
   // --- Logout ---
   logoutLink.addEventListener('click', function(e) {
     e.preventDefault();
     if (confirm('Are you sure you want to logout?')) {
       localStorage.clear();
-      window.location.href = 'login.html';
+      window.location.href = 'filee.html';
     }
   });
-
-  // --- Notifications ---
-  let notifications = [];
-  async function fetchNotifications() {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/admin/notifications', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to fetch notifications');
-      notifications = await res.json();
-      renderNotifications();
-      updateBadge();
-    } catch (err) { console.error(err); }
-  }
-
-  function renderNotifications() {
-    dropdown.innerHTML = '';
-    notifications.forEach((note, i) => {
-      const item = document.createElement('div');
-      item.className = 'dropdown-item';
-      if (!note.read) item.style.fontWeight = 'bold';
-      item.innerHTML = `${note.message} <div style="font-size:12px;color:#888;">${new Date(note.createdAt).toLocaleString()}</div>`;
-      item.addEventListener('click', async () => {
-        try {
-          const token = localStorage.getItem('token');
-          await fetch(`http://localhost:5000/api/admin/notifications/${note._id}/read`, {
-            method:'PATCH',
-            headers:{'Authorization':`Bearer ${token}`}
-          });
-          notifications[i].read = true;
-          updateBadge();
-          renderNotifications();
-        } catch(e){ console.error(e); }
-      });
-      dropdown.appendChild(item);
-    });
-  }
-
-  function updateBadge() {
-    const unread = notifications.filter(n=>!n.read).length;
-    if (unread>0){ badge.textContent = unread; badge.style.display='block'; }
-    else badge.style.display='none';
-  }
-
-  bell.addEventListener('click', ()=>{ dropdown.classList.toggle('active'); });
-  document.addEventListener('click', e=>{ if(!bell.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.remove('active'); });
-
-  fetchNotifications();
-  setInterval(fetchNotifications, 30000);
 
   // --- KPI Cards ---
   async function fetchKPIs() {
@@ -159,27 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('totalTutors').textContent = data.totalTutors;
       document.getElementById('totalStudents').textContent = data.totalStudents;
       document.getElementById('totalAnnouncements').textContent = data.totalAnnouncements;
-      document.getElementById('pendingRequests').textContent = data.pendingRequests;
     } catch(e){ console.error(e); }
-  }
-
-  // --- Charts ---
-  async function renderCharts() {
-    const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:5000/api/admin/charts', { headers:{ 'Authorization': `Bearer ${token}` } });
-    const data = await res.json();
-
-    new Chart(document.getElementById('studentsPerTutor'), {
-      type: 'bar',
-      data: { labels: data.studentsPerTutor.labels, datasets:[{label:'Students',data:data.studentsPerTutor.values,backgroundColor:'#3b82f6'}] },
-      options:{ responsive:true }
-    });
-
-    new Chart(document.getElementById('announcementsOverTime'), {
-      type: 'line',
-      data: { labels:data.announcementsOverTime.labels,datasets:[{label:'Announcements',data:data.announcementsOverTime.values,backgroundColor:'#06b6d4',fill:true}] },
-      options:{ responsive:true }
-    });
   }
 
   // --- Recent Activities Table ---
@@ -199,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   fetchKPIs();
-  renderCharts();
   fetchActivities();
 });
 </script>

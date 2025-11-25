@@ -23,9 +23,11 @@ const createAnnouncement = async (req, res) => {
 
     // --- Generate notifications for all students (from Users collection) ---
     const students = await User.find({ role: "student" }, "_id username");
+    const senderName = req.user.username || "Tutor";
     const notifications = students.map((student) => ({
       studentId: student._id, // reference User _id so student fetch matches
-      message: `New ${type} from ${req.user.username}: ${title}`,
+      // Message shown in student notifications dropdown
+      message: `From ${senderName}: ${message}`,
       read: false,
     }));
 
@@ -65,8 +67,8 @@ const deleteAnnouncement = async (req, res) => {
     if (!announcement)
       return res.status(404).json({ message: "Announcement not found" });
 
-    // Only allow creator or admin to delete
-    if (announcement.createdBy.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+    // Allow any tutor or admin to delete
+    if (req.user.role !== "tutor" && req.user.role !== "admin") {
       return res.status(403).json({ message: "Forbidden: cannot delete this announcement" });
     }
 

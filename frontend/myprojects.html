@@ -9,12 +9,35 @@
 </head>
 <body>
 
+  <nav class="top-nav student-nav">
+    <div class="nav-logo">Pamoja Learning Center</div>
+    <ul class="nav-links">
+      <li><a href="Student.html">Dashboard</a></li>
+      <li><a href="myprojects.html" class="active">My Projects</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="filee.html">Logout</a></li>
+    </ul>
+  </nav>
+
   <!-- ===== Top Bar ===== -->
   <header class="topbar">
     <div class="search-container">
       <i class='bx bx-search'></i>
       <input type="text" id="searchInput" placeholder="Search in My Projects..." />
     </div>
+
+  <!-- ===== Share to Tutor Modal ===== -->
+  <div id="shareModal" class="modal">
+    <div class="modal-content">
+      <span class="close share-close">&times;</span>
+      <h2>Share Project with Tutor</h2>
+      <label for="tutorSelect">Choose Tutor:</label>
+      <select id="tutorSelect">
+        <option value="">Loading tutors...</option>
+      </select>
+      <button id="shareConfirmBtn">Share</button>
+    </div>
+  </div>
 
     <button class="new-btn">
       <i class='bx bx-plus'></i> New
@@ -80,10 +103,69 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewModal = document.getElementById("previewModal");
   const previewFrame = document.getElementById("previewFrame");
   const previewClose = previewModal.querySelector(".close");
+  const shareModal = document.getElementById("shareModal");
+  const shareClose = shareModal.querySelector(".share-close");
+  const tutorSelect = document.getElementById("tutorSelect");
+  const shareConfirmBtn = document.getElementById("shareConfirmBtn");
+  let currentShareFileId = null;
 
   function getToken() {
     return localStorage.getItem("token") || "";
   }
+  
+  async function loadTutorsIntoSelect(){
+    tutorSelect.innerHTML = `<option value="">Loading tutors...</option>`;
+    try {
+      const res = await fetch("http://localhost:5000/api/tutor/list", {
+        headers: { "Authorization": "Bearer " + getToken() }
+      });
+      const tutors = await res.json();
+      tutorSelect.innerHTML = "";
+      if (!Array.isArray(tutors) || !tutors.length){
+        tutorSelect.innerHTML = `<option value="">No tutors available</option>`;
+        return;
+      }
+      tutors.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t._id;
+        opt.textContent = t.username || t.email;
+        tutorSelect.appendChild(opt);
+      });
+    } catch(err){
+      console.error("Failed to load tutors", err);
+      tutorSelect.innerHTML = `<option value="">Failed to load tutors</option>`;
+    }
+  }
+
+  shareConfirmBtn.addEventListener("click", async () => {
+    const tutorId = tutorSelect.value;
+    if (!tutorId){
+      return alert("Please choose a tutor");
+    }
+    if (!currentShareFileId){
+      return alert("No file selected to share");
+    }
+    try {
+      const res = await fetch(`http://localhost:5000/api/files/${currentShareFileId}/share`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + getToken(),
+        },
+        body: JSON.stringify({ tutorId }),
+      });
+      const data = await res.json();
+      if (!res.ok){
+        console.error("Share failed", data);
+        return alert(data.message || "Failed to share file");
+      }
+      alert("File shared with tutor");
+      shareModal.style.display = "none";
+    } catch(err){
+      console.error("Share request failed", err);
+      alert("Failed to share file");
+    }
+  });
 
   function getStudentNameFromToken() {
     const token = getToken();
@@ -103,6 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   previewClose.addEventListener("click", () => previewModal.style.display = "none");
   window.addEventListener("click", (e) => { if(e.target === previewModal) previewModal.style.display = "none"; });
+
+  shareClose.addEventListener("click", () => shareModal.style.display = "none");
+  window.addEventListener("click", (e) => { if(e.target === shareModal) shareModal.style.display = "none"; });
 
   let selectedFiles = [];
 
@@ -203,8 +288,15 @@ document.addEventListener("DOMContentLoaded", () => {
       newFile.classList.add("file-item");
       newFile.innerHTML = `
         <i class='bx ${iconClass}'></i>
-        <span>${file.fileName}</span>
-        <button class="delete-btn" data-id="${file._id}">Delete</button>
+        <span>
+          ${file.fileName}
+          ${file.feedback ? `<br><small style="color:#6b7280;">Feedback: ${file.feedback}</small>` : ""}
+        </span>
+        <div class="file-actions" style="display:flex; gap:8px; margin-left:auto;">
+          <button class="download-btn" style="background:#7ec8ff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Download</button>
+          <button class="share-btn" style="background:#c9a5ff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Share Tutor</button>
+          <button class="delete-btn" data-id="${file._id}" style="background:#ff6b6b; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; color:#fff;">Delete</button>
+        </div>
       `;
 
       newFile.querySelector("span").addEventListener("click", () => {
@@ -212,7 +304,24 @@ document.addEventListener("DOMContentLoaded", () => {
         else loadFolderFiles(file.folderName);
       });
 
-      newFile.querySelector(".delete-btn").addEventListener("click", () => {
+      // Download action
+      newFile.querySelector(".download-btn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (file.isFolder) return; // simple behavior: only download files
+        window.open(`http://localhost:5000/${file.filePath}`, "_blank");
+      });
+
+      // Share to tutor action
+      newFile.querySelector(".share-btn").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        currentShareFileId = file._id;
+        await loadTutorsIntoSelect();
+        shareModal.style.display = "flex";
+      });
+
+      // Delete action
+      newFile.querySelector(".delete-btn").addEventListener("click", (e) => {
+        e.stopPropagation();
         if(confirm("Are you sure you want to delete this file?")){
           fetch(`http://localhost:5000/api/files/${file._id}`, {
             method:"DELETE",

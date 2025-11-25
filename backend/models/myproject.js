@@ -3,11 +3,18 @@ const mongoose = require("mongoose");
 const fileSchema = new mongoose.Schema({
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Student",       // or "User" depending on your auth model
+    ref: "User",       // link to authenticated user
     required: true
   },
 
   studentName: { type: String, required: true }, // uploader’s name
+
+  // Optional tutor this project is shared with
+  tutorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+  },
 
   fileName: { type: String, required: true },
   fileType: { type: String },
