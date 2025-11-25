@@ -100,9 +100,32 @@ app.use('/admin', adminLoginRoutes);
 // ✅ Serve frontend static files AFTER API routes
 app.use(express.static(path.join(__dirname, "../frontend")));
 
+// ✅ Root route - redirect to your login page
+app.get("/", (req, res) => {
+  // Check if index.html exists, otherwise serve login.html
+  const indexPath = path.join(__dirname, "../frontend", "index.html");
+  const loginPath = path.join(__dirname, "../frontend", "login.html");
+  
+  const fs = require('fs');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else if (fs.existsSync(loginPath)) {
+    res.sendFile(loginPath);
+  } else {
+    res.status(404).send("Frontend files not found. Please check your deployment.");
+  }
+});
+
 // ✅ Catch-all route - serves index.html for any non-API routes (SPA support)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend", "index.html"));
+app.get("/*", (req, res) => {
+  const indexPath = path.join(__dirname, "../frontend", "index.html");
+  const fs = require('fs');
+  
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send("Page not found");
+  }
 });
 
 // ✅ Start Server
