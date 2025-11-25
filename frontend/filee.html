@@ -66,8 +66,8 @@
 
         try {
           const loginUrl = isAdmin
-            ? "http://localhost:5000/admin/login"   // Admins use admin login route
-            : "http://localhost:5000/api/auth/login"; // Students/Tutors use user auth route
+            ? "/admin/login"   // Admins use admin login route
+            : "/api/auth/login"; // Students/Tutors use user auth route
 
           const response = await fetch(loginUrl, {
             method: "POST",

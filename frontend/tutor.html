@@ -76,8 +76,8 @@
     }
 
     try {
-      // Updated route to match backend
-      const res = await fetch("http://localhost:5000/api/dashboard/tutor-dashboard", {
+      // Updated route to match backend (same-origin)
+      const res = await fetch("/api/dashboard/tutor-dashboard", {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"

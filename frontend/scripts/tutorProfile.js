@@ -1,6 +1,6 @@
 // frontend/js/tutorProfile.js
 document.addEventListener("DOMContentLoaded", () => {
-  const BASE_URL = "http://localhost:5000";
+  const BASE_URL = ""; // use same-origin base URL for both dev and production
   const photoInput = document.getElementById("photo-input");
   const changeBtn = document.getElementById("change-photo-btn");
   const profileImg = document.getElementById("profile-img");

@@ -1,5 +1,5 @@
 // -------------------- CONFIG --------------------
-const API_URL = "http://localhost:5000/api/tutor/files"; // Tutor backend
+const API_URL = "/api/tutor/files"; // Tutor backend (same-origin)
 const token = localStorage.getItem("token");
 
 // -------------------- DOM ELEMENTS --------------------
@@ -71,7 +71,7 @@ function renderProjects(studentName, files) {
         ${file.feedback ? `<p class="project-feedback"><strong>Feedback:</strong> ${file.feedback}</p>` : ""}
       </div>
       <div class="project-actions">
-        <a href="http://localhost:5000/${file.filePath}" target="_blank">
+        <a href="/${file.filePath}" target="_blank">
           <button>Download</button>
         </a>
         <label>
@@ -91,7 +91,7 @@ function renderProjects(studentName, files) {
     feedbackBtn.addEventListener("click", async () => {
       const feedback = feedbackInput.value.trim();
       try {
-        const res = await fetch(`http://localhost:5000/api/tutor/files/${file._id}/review`, {
+        const res = await fetch(`/api/tutor/files/${file._id}/review`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

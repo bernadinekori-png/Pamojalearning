@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
   async function fetchKPIs() {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:5000/api/admin/kpis', { headers:{ 'Authorization': `Bearer ${token}` } });
+      const res = await fetch('/api/admin/kpis', { headers:{ 'Authorization': `Bearer ${token}` } });
       const data = await res.json();
       document.getElementById('totalTutors').textContent = data.totalTutors;
       document.getElementById('totalStudents').textContent = data.totalStudents;
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
   async function fetchActivities() {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:5000/api/admin/recent-activities', { headers:{ 'Authorization': `Bearer ${token}` } });
+      const res = await fetch('/api/admin/recent-activities', { headers:{ 'Authorization': `Bearer ${token}` } });
       const activities = await res.json();
       const tbody = document.getElementById('activitiesTable');
       tbody.innerHTML='';

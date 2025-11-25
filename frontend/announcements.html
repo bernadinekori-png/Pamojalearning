@@ -132,7 +132,7 @@
       // Fetch and display dynamic announcements
       async function loadAnnouncements() {
         try {
-          const res = await fetch("http://localhost:5000/api/announcements", {
+          const res = await fetch("/api/announcements", {
             headers: { Authorization: `Bearer ${token}` },
           });
 
@@ -188,7 +188,7 @@
               deleteBtn.addEventListener('click', async () => {
                 if (!confirm('Delete this announcement?')) return;
                 try {
-                  const delRes = await fetch(`http://localhost:5000/api/announcements/${announcement._id}`, {
+                  const delRes = await fetch(`/api/announcements/${announcement._id}`, {
                     method: 'DELETE',
                     headers: { Authorization: `Bearer ${token}` },
                   });
@@ -230,7 +230,7 @@
         if (!title || !message) return alert("Title and message are required!");
 
         try {
-          const res = await fetch("http://localhost:5000/api/announcements", {
+          const res = await fetch("/api/announcements", {
             method: "POST",
             headers: { 
               "Content-Type": "application/json",

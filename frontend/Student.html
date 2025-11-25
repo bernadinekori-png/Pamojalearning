@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const res = await fetch('http://localhost:5000/api/files', {
+      const res = await fetch('/api/files', {
         headers: { 'Authorization': 'Bearer ' + token }
       });
       if (!res.ok) return; // if forbidden (wrong role), just skip
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
   async function fetchNotifications() {
     try {
       const token = localStorage.getItem('token'); // student's JWT
-      const res = await fetch('http://localhost:5000/api/student/notifications', {
+      const res = await fetch('/api/student/notifications', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch notifications');
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
       item.addEventListener('click', async () => {
         try {
           const token = localStorage.getItem('token');
-          const res = await fetch(`http://localhost:5000/api/student/notifications/${note._id}/read`, {
+          const res = await fetch(`/api/student/notifications/${note._id}/read`, {
             method: 'PATCH',
             headers: { 'Authorization': `Bearer ${token}` }
           });
