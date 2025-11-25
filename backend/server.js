@@ -103,7 +103,7 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 // ✅ Root route - redirect to your login page
 app.get("/", (req, res) => {
   // Check if index.html exists, otherwise serve login.html
-  const indexPath = path.join(__dirname, "../frontend", "index.html");
+  const indexPath = path.join(__dirname, "../frontend", "filee.html");
   const loginPath = path.join(__dirname, "../frontend", "login.html");
   
   const fs = require('fs');
