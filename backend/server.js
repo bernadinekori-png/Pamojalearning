@@ -116,18 +116,6 @@ app.get("/", (req, res) => {
   }
 });
 
-// ✅ Catch-all route - serves index.html for any non-API routes (SPA support)
-app.get("/*", (req, res) => {
-  const indexPath = path.join(__dirname, "../frontend", "index.html");
-  const fs = require('fs');
-  
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(404).send("Page not found");
-  }
-});
-
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
