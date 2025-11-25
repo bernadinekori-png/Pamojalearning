@@ -45,7 +45,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI, // ✅ Fixed: Changed from MONGO_URI to MONGODB_URI
+    mongoUrl: process.env.MONGO_URI, // ✅ Fixed: Changed from MONGO_URI to MONGODB_URI
     collectionName: "sessions",
     touchAfter: 24 * 3600 // Lazy session update (24 hours)
   }),
@@ -97,7 +97,7 @@ app.get("/api/test", (req, res) => {
 });
 
 // ✅ Serve Frontend - This should be LAST, after all API routes
-app.get("*", (req, res) => {
+app.get((req, res) => {
   res.sendFile(path.join(__dirname, "../frontend", "filee.html"));
 });
 
