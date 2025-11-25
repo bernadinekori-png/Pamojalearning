@@ -40,10 +40,24 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // --- ✅ Session middleware for admin login (MongoDB-backed) ---
+const mongoUrl = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+if (!mongoUrl) {
+  console.error("❌ ERROR: MONGODB_URI environment variable is not set!");
+  process.exit(1);
+}
+
+console.log("✅ MongoDB URL found for session store");
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'supersecretkey',
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: mongoUrl,
+    collectionName: "sessions",
+    touchAfter: 24 * 3600 // Lazy session update (24 hours)
+  }),
   cookie: { 
     maxAge: 1000 * 60 * 60 * 24, // 24 hours
     httpOnly: true, // Prevents XSS attacks
@@ -54,9 +68,6 @@ app.use(session({
 
 // Serve uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Serve frontend static files
-app.use(express.static(path.join(__dirname, "../frontend")));
 
 // ✅ Connect to MongoDB
 (async () => {
@@ -86,14 +97,12 @@ app.use('/api/announcements', announceRoutes);
 app.use('/api/admin', settingsRoutes);
 app.use('/admin', adminLoginRoutes);
 
-// ✅ Test Routes
-app.get("/api/test", (req, res) => {
-  res.json({ message: "API is working" });
-});
+// ✅ Serve frontend static files AFTER API routes
+app.use(express.static(path.join(__dirname, "../frontend")));
 
-// ✅ Serve Frontend - This should be LAST, after all API routes
-app.get((req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend", "filee.html"));
+// ✅ Catch-all route - serves index.html for any non-API routes (SPA support)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend", "index.html"));
 });
 
 // ✅ Start Server
