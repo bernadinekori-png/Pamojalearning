@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const session = require("express-session"); // ✅ Added for admin login sessions
+const MongoStore = require("connect-mongo");
 require("dotenv").config();
 const path = require("path");
 
@@ -39,11 +40,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false })); // support HTML form posts
 
 
-// --- ✅ Session middleware for admin login ---
+// --- ✅ Session middleware for admin login (MongoDB-backed) ---
 app.use(session({
   secret: process.env.SESSION_SECRET || 'supersecretkey',
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    collectionName: "sessions",
+  }),
   cookie: { maxAge: 1000 * 60 * 60 } // 1 hour
 }));
 
