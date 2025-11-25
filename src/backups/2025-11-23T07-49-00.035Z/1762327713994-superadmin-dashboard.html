@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Admin Dashboard | Report Portal</title>
+
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2>⚙️ Super Admin</h2>
+    <nav>
+      <a class="active" data-section="overview">📊 Overview</a>
+      <a data-section="users">👥 Manage Users</a>
+      <a data-section="reports">📝 Reports</a>
+      <a data-section="notifications">🔔 Notifications</a>
+    </nav>
+    <a id="logoutBtn" class="logout">🚪 Logout</a>
+  </aside>
+
+  <!-- Main -->
+  <main class="content">
+
+    <!-- Overview -->
+    <section id="overview" class="active">
+      <h2>📈 Overview</h2>
+
+      <div class="bento-grid">
+        <div class="bento-card">
+          <h3>Total Users</h3>
+          <p class="metric" id="totalUsers">0</p>
+          <small>👥 All registered users</small>
+        </div>
+
+        <div class="bento-card">
+          <h3>Total Admins</h3>
+          <p class="metric" id="totalAdmins">0</p>
+          <small>🛡️ Admin & superadmin users</small>
+        </div>
+
+        <div class="bento-card">
+          <h3>Total Reports</h3>
+          <p class="metric" id="totalReports">0</p>
+          <small>📄 All submitted reports</small>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="reportsChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Users -->
+    <section id="users">
+      <h2>👥 Manage Users</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable">
+            <tr>
+              <td colspan="4" class="center">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Reports -->
+    <section id="reports">
+      <h2>📝 Reports</h2>
+      <div id="reportsContainer" class="report-list">
+        <p>Loading reports...</p>
+      </div>
+    </section>
+
+    <!-- Notifications -->
+    <section id="notifications">
+      <h2>🔔 Notifications</h2>
+      <div id="notificationsList">
+        <p>Loading notifications...</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Section Switcher -->
+  <script>
+    const navLinks = document.querySelectorAll(".sidebar nav a");
+    const sections = document.querySelectorAll(".content section");
+
+    navLinks.forEach(link => {
+      link.addEventListener("click", () => {
+        navLinks.forEach(l => l.classList.remove("active"));
+        sections.forEach(s => s.classList.remove("active"));
+
+        link.classList.add("active");
+        document.getElementById(link.dataset.section).classList.add("active");
+        document.querySelector(".content").scrollTop = 0;
+      });
+    });
+  </script>
+
+  <script src="liveUpdates.js"></script>
+  <script src="superadmin.js"></script>
+</body>
+</html>
