@@ -44,11 +44,6 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'supersecretkey',
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI, // ✅ Fixed: Changed from MONGO_URI to MONGODB_URI
-    collectionName: "sessions",
-    touchAfter: 24 * 3600 // Lazy session update (24 hours)
-  }),
   cookie: { 
     maxAge: 1000 * 60 * 60 * 24, // 24 hours
     httpOnly: true, // Prevents XSS attacks
